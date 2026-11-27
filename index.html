@@ -2606,6 +2606,8 @@ button, input, select, textarea {
   /* =========================================================
      7. HANDLERS DE INTERAÇÃO (GLOBAIS PARA ONCLICK/ONCHANGE)
      ========================================================= */
+  window.renderPlanView = renderPlanView;
+  
   window.toggleTheme = async function () {
     appState.theme = appState.theme === 'light' ? 'dark' : 'light';
     applyTheme();
