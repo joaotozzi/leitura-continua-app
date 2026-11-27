@@ -240,6 +240,7 @@
       line-height: 1.15;
       font-variant-numeric: lining-nums tabular-nums;
       color: var(--on-surface);
+      overflow-wrap: anywhere;
     }
 
     .metric-note {
@@ -265,6 +266,10 @@
       flex: 1 1 200px;
     }
 
+    .period-group {
+      flex: 0 0 auto;
+    }
+
     .field-label {
       font-family: var(--font-label);
       font-weight: 600;
@@ -276,6 +281,7 @@
 
     .field-select, .field-input {
       min-height: 44px;
+      width: 100%;
       padding: var(--space-sm) var(--space-md);
       background-color: var(--surface-container-low);
       border: 1px solid var(--outline-variant);
@@ -372,6 +378,8 @@
       text-transform: uppercase;
       color: var(--secondary);
       margin-bottom: var(--space-sm);
+      max-width: 100%;
+      overflow-wrap: anywhere;
     }
 
     .office-title {
@@ -386,6 +394,7 @@
       color: var(--on-surface-variant);
       font-size: 0.95rem;
       margin: 0;
+      overflow-wrap: anywhere;
     }
 
     .liturgy-block {
@@ -421,6 +430,7 @@
       line-height: 1.25;
       color: var(--on-surface);
       margin: 0;
+      overflow-wrap: anywhere;
     }
 
     .reading-sub {
@@ -455,6 +465,7 @@
       font-weight: 600;
       font-size: 1.15rem;
       color: var(--on-surface);
+      overflow-wrap: anywhere;
     }
 
     .rubric-box {
@@ -499,6 +510,7 @@
       color: var(--secondary);
       font-size: 0.95rem;
       display: none;
+      overflow-wrap: anywhere;
     }
     .status-banner.is-visible { display: block; }
 
@@ -547,11 +559,17 @@
       font-weight: 600;
       font-size: 1.15rem;
       color: var(--on-surface);
+      overflow-wrap: anywhere;
     }
 
     .plan-psalm-ref {
       font-size: 0.92rem;
       color: var(--on-surface-variant);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-xs);
+      margin-top: 2px;
     }
 
     .badge {
@@ -597,19 +615,28 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: var(--space-sm);
+      gap: var(--space-sm) var(--space-md);
     }
 
     .book-title-wrap {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: var(--space-sm);
-      flex: 1 1 200px;
+      flex: 1 1 210px;
+    }
+
+    .book-actions-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
     }
 
     .book-check {
       width: 22px;
       height: 22px;
+      flex: 0 0 22px;
       accent-color: var(--primary);
       cursor: pointer;
     }
@@ -625,6 +652,7 @@
       font-size: 0.88rem;
       color: var(--on-surface-variant);
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     .chapters-grid {
@@ -678,11 +706,53 @@
 
     @media (max-width: 640px) {
       .app-shell { padding: var(--space-sm) var(--space-sm) var(--space-xl); }
-      .masthead { padding: var(--space-md) var(--space-sm); }
-      .nav-bar { gap: var(--space-xs); }
-      .nav-tab { flex: 1 1 auto; text-align: center; font-size: 0.75rem; padding: var(--space-xs) var(--space-sm); }
-      .plan-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); }
-      .office-actions { flex-direction: column; align-items: stretch; }
+      .masthead {
+        padding: var(--space-md) var(--space-sm);
+        outline-offset: -4px;
+        margin-bottom: var(--space-md);
+      }
+      .nav-bar {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-xs);
+        margin-bottom: var(--space-md);
+      }
+      .nav-tab {
+        width: 100%;
+        text-align: center;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        padding: var(--space-xs) var(--space-xs);
+      }
+      .metrics-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-sm);
+        padding: var(--space-sm) 0;
+        margin-bottom: var(--space-md);
+      }
+      .metrics-strip .metric-cell:last-child {
+        grid-column: 1 / -1;
+        border-top: var(--gilt-hairline);
+        padding-top: var(--space-sm);
+      }
+      .metric-value { font-size: 1.4rem; }
+      .controls-row { gap: var(--space-sm); margin-bottom: var(--space-md); }
+      .field-group { flex: 1 1 100%; }
+      .period-group { flex: 1 1 100%; }
+      .segmented-toggle { display: flex; width: 100%; }
+      .segmented-btn { flex: 1 1 50%; }
+      .reading-callout, .rubric-box { padding: var(--space-sm) var(--space-md); }
+      .reading-ref { font-size: 1.2rem; }
+      .plan-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-xs);
+        padding: var(--space-sm) var(--space-xs);
+      }
+      .plan-index { min-width: 0; }
+      .book-actions-wrap { width: 100%; }
+      .chapters-grid { grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); }
+      .chap-btn { min-width: 0; }
+      .office-actions { flex-direction: column; align-items: stretch; padding: var(--space-sm); }
       .btn { width: 100%; }
     }
 
@@ -743,7 +813,7 @@
           </select>
         </div>
 
-        <div class="field-group" style="flex: 0 0 auto;">
+        <div class="field-group period-group">
           <span class="field-label">Momento da Coleta</span>
           <div class="segmented-toggle" role="group" aria-label="Selecionar coleta da manhã ou da tarde">
             <button type="button" class="segmented-btn" id="btn-period-morning" onclick="setOfficePeriod('morning')">Manhã</button>
@@ -810,7 +880,7 @@
       </p>
 
       <div class="controls-row" style="margin-bottom: var(--space-md);">
-        <div style="display:flex; flex-wrap:wrap; gap: var(--space-sm);">
+        <div style="display:flex; flex-wrap:wrap; gap: var(--space-sm); width: 100%;">
           <button type="button" class="btn btn-secondary btn-small" onclick="exportProgressBackup()">Exportar Backup (JSON)</button>
           <button type="button" class="btn btn-secondary btn-small" onclick="resetAllProgress(this)">Zerar Todo o Progresso</button>
         </div>
@@ -932,11 +1002,11 @@
       4: [
         [`gn 1:1—2:3`, `Salmo 8:1–9`], [`gn 2:4—4:26`, `Salmo 51:1–9`], [`gn 5:1—6:8`, `Salmo 14:1–7`],
         [`gn 6:9—9:29`, `Salmo 29:1–11`], [`gn 10:1—11:26`, `Salmo 2:1–12`], [`gn 11:27—12:20`, `Salmo 105:16–30`],
-        [`gn 13:1—14:24`, `Salmo 10:1–18`], [`gn 15:1—16:16`, `Salmo 89:19–37`], [`gn 17:1–27`, `Salmo 105:31–45`],
+        [`gn 13:1—14:24`, `Salmo 10:1–18`], [`gn 15:1—16:16`, `Salmo 89:19–37`], [`gn 17:1—27`, `Salmo 105:31–45`],
         [`gn 18:1—19:38`, `Salmo 11:1–7`], [`gn 20:1—21:34`, `Salmo 13:1–6`], [`gn 22:1—23:20`, `Salmo 40:1–10`],
         [`gn 24:1—25:18`, `Salmo 45:1–9`], [`gn 25:19—26:35`, `Salmo 105:1–11`], [`gn 27:1—28:22`, `Salmo 121:1–8`],
         [`gn 29:1—31:55`, `Salmo 124:1–8`], [`gn 32:1—33:20`, `Salmo 125:1–5`], [`gn 34:1—36:43`, `Salmo 42:1–11`],
-        [`gn 37:1—38:30`, `Salmo 69:1–18`], [`gn 39:1—40:23`, `Salmo 105:16–22`], [`gn 41:1–57`, `Salmo 113:1–9`],
+        [`gn 37:1—38:30`, `Salmo 69:1–18`], [`gn 39:1—40:23`, `Salmo 105:16–22`], [`gn 41:1—57`, `Salmo 113:1–9`],
         [`gn 42:1—44:34`, `Salmo 105:23–36`], [`gn 45:1—46:27`, `Salmo 105:37–45`], [`gn 46:28—48:22`, `Salmo 128:1–6`],
         [`gn 49:1–33`, `Salmo 49:1–20`], [`gn 50:1–26`, `Salmo 37:1–11`], [`ex 1:1—2:25`, `Salmo 12:1–8`],
         [`ex 3:1—4:31`, `Salmo 99:1–9`], [`ex 5:1—6:27`, `Salmo 135:1–14`], [`ex 6:28—8:32`, `Salmo 105:26–38`],
@@ -945,32 +1015,32 @@
         [`ex 19:1—20:26`, `Salmo 19:7–14`], [`ex 21:1—22:31`, `Salmo 82:1–8`], [`ex 23:1—24:18`, `Salmo 24:1–10`],
         [`ex 25:1—26:37`, `Salmo 84:1–12`], [`ex 27:1—28:43`, `Salmo 132:1–18`], [`ex 29:1—30:38`, `Salmo 141:1–10`],
         [`ex 31:1—32:35`, `Salmo 106:13–27`], [`ex 33:1—34:35`, `Salmo 99:1–9`], [`ex 35:1—36:38`, `Salmo 100:1–5`],
-        [`ex 37:1—38:31`, `Salmo 132:1–18`], [`ex 39:1—43`, `Salmo 133:1–3`], [`ex 40:1–38`, `Salmo 29:1–11`],
+        [`ex 37:1—38:31`, `Salmo 132:1–18`], [`ex 39:1—43`, `Salmo 133:1–3`], [`ex 40:1—38`, `Salmo 29:1–11`],
         [`dt 1:1—2:23`, `Salmo 90:1–17`], [`dt 2:24—3:29`, `Salmo 44:1–8`], [`dt 4:1–49`, `Salmo 19:7–14`],
         [`dt 5:1—6:25`, `Salmo 119:169–176`],
         // Ano II - Quinta
         [`lv 1:1—3:17`, `Salmo 40:1–10`], [`lv 4:1—6:7`, `Salmo 51:1–9`], [`lv 6:8—7:38`, `Salmo 50:1–15`],
         [`lv 8:1—10:20`, `Salmo 99:1–9`], [`lv 11:1—12:8`, `Salmo 19:7–14`], [`lv 13:1—14:57`, `Salmo 103:1–11`],
         [`lv 15:1—16:34`, `Salmo 38:1–22`], [`lv 17:1—18:30`, `Salmo 16:1–11`], [`lv 19:1—20:27`, `Salmo 15:1–5`],
-        [`lv 21:1—22:33`, `Salmo 24:1–10`], [`lv 23:1—24:23`, `Salmo 25:1–10`], [`lv 25:1–55`, `Salmo 85:8–13`],
-        [`lv 26:1–46`, `Salmo 1:1–6`], [`lv 27:1–34`, `Salmo 6:1–10`], [`nm 1:1—2:34`, `Salmo 120:1–7`],
-        [`nm 3:1—4:49`, `Salmo 134:1–3`], [`nm 5:1—6:27`, `Salmo 67:1–7`], [`nm 7:1–89`, `Salmo 131:1–3`],
+        [`lv 21:1—22:33`, `Salmo 24:1–10`], [`lv 23:1—24:23`, `Salmo 25:1–10`], [`lv 25:1—55`, `Salmo 85:8–13`],
+        [`lv 26:1—46`, `Salmo 1:1–6`], [`lv 27:1—34`, `Salmo 6:1–10`], [`nm 1:1—2:34`, `Salmo 120:1–7`],
+        [`nm 3:1—4:49`, `Salmo 134:1–3`], [`nm 5:1—6:27`, `Salmo 67:1–7`], [`nm 7:1—89`, `Salmo 131:1–3`],
         [`nm 8:1—10:36`, `Salmo 81:1–16`], [`nm 11:1—12:16`, `Salmo 78:17–31`], [`nm 13:1—14:45`, `Salmo 95:1–11`],
         [`nm 15:1—16:50`, `Salmo 106:13–27`], [`nm 17:1—19:22`, `Salmo 110:1–7`], [`nm 20:1—21:35`, `Salmo 114:1–8`],
         [`nm 22:1—24:25`, `Salmo 23:1–6`], [`nm 25:1—26:65`, `Salmo 106:28–31`], [`nm 27:1—28:31`, `Salmo 104:24–35`],
-        [`nm 29:1—30:16`, `Salmo 81:1–16`], [`nm 31:1—32:42`, `Salmo 44:1–8`], [`nm 33:1–56`, `Salmo 77:1–20`],
-        [`nm 34:1—35:34`, `Salmo 91:1–16`], [`nm 36:1–13`, `Salmo 16:1–11`], [`dt 7:1—8:20`, `Salmo 105:1–15`],
+        [`nm 29:1—30:16`, `Salmo 81:1–16`], [`nm 31:1—32:42`, `Salmo 44:1–8`], [`nm 33:1—56`, `Salmo 77:1–20`],
+        [`nm 34:1—35:34`, `Salmo 91:1–16`], [`nm 36:1—13`, `Salmo 16:1–11`], [`dt 7:1—8:20`, `Salmo 105:1–15`],
         [`dt 9:1—10:22`, `Salmo 106:19–27`], [`dt 11:1—12:32`, `Salmo 132:1–18`], [`dt 13:1—14:29`, `Salmo 119:129–144`],
         [`dt 15:1—16:22`, `Salmo 82:1–8`], [`dt 17:1—18:22`, `Salmo 119:161–168`], [`dt 19:1—20:20`, `Salmo 46:1–11`],
         [`dt 21:1—22:30`, `Salmo 51:1–19`], [`dt 23:1—24:22`, `Salmo 146:1–10`], [`dt 25:1—26:19`, `Salmo 105:1–15`],
         [`dt 27:1—28:35`, `Salmo 1:1–6`], [`dt 28:36–68`, `Salmo 137:1–9`], [`dt 29:1—30:20`, `Salmo 19:7–14`],
-        [`dt 31:1–30`, `Salmo 31:1–8`], [`dt 32:1–52`, `Salmo 18:1–19`], [`dt 33:1–29`, `Salmo 144:1–15`],
-        [`dt 34:1–12`, `Salmo 90:1–17`], [`lv 19:1–18; 26:1–13`, `Salmo 15:1–5`], [`dt 6:4–25; 10:12–22`, `Salmo 119:169–176`],
+        [`dt 31:1—30`, `Salmo 31:1–8`], [`dt 32:1—52`, `Salmo 18:1–19`], [`dt 33:1—29`, `Salmo 144:1–15`],
+        [`dt 34:1–12`, `Salmo 90:1–17`], [`lv 19:1—18; 26:1—13`, `Salmo 15:1–5`], [`dt 6:4–25; 10:12–22`, `Salmo 119:169–176`],
         [`dt 30:11–20; 34:1–12`, `Salmo 90:1–17`]
       ],
       5: [
         [`mc 1:1–20`, `Salmo 27:1–6`], [`mc 1:21–45`, `Salmo 103:1–11`], [`mc 2:1—3:6`, `Salmo 130:1–8`],
-        [`mc 3:7–35`, `Salmo 15:1–5`], [`mc 4:1–41`, `Salmo 107:23–32`], [`mc 5:1–43`, `Salmo 116:1–9`],
+        [`mc 3:7–35`, `Salmo 15:1–5`], [`mc 4:1–41`, `Salmo 107:23–32`], [`mc 5:1—43`, `Salmo 116:1–9`],
         [`mc 6:1–29`, `Salmo 116:10–19`], [`mc 6:30–56`, `Salmo 77:11–20`], [`mc 7:1–37`, `Salmo 51:10–19`],
         [`mc 8:1–38`, `Salmo 34:11–22`], [`mc 9:1–50`, `Salmo 99:1–9`], [`mc 10:1–52`, `Salmo 130:1–8`],
         [`mc 11:1–33`, `Salmo 118:19–29`], [`mc 12:1–44`, `Salmo 118:1–9`], [`mc 13:1–37`, `Salmo 46:1–11`],
@@ -1016,31 +1086,31 @@
         [`jz 13:1—16:31`, `Salmo 129:1–8`], [`jz 17:1—18:31`, `Salmo 115:1–18`], [`jz 19:1—21:25`, `Salmo 43:1–5`],
         [`rt 1:1—2:23`, `Salmo 31:1–8`], [`rt 3:1—4:22`, `Salmo 16:1–11`], [`1sm 1:1—3:21`, `Salmo 115:1–18`],
         [`1sm 4:1—7:17`, `Salmo 78:56–72`], [`1sm 8:1—10:27`, `Salmo 89:38–52`], [`1sm 11:1—13:23`, `Salmo 20:1–9`],
-        [`1sm 14:1–52`, `Salmo 144:1–15`], [`1sm 15:1—16:23`, `Salmo 51:1–19`], [`1sm 17:1–58`, `Salmo 144:1–15`],
+        [`1sm 14:1—52`, `Salmo 144:1–15`], [`1sm 15:1—16:23`, `Salmo 51:1–19`], [`1sm 17:1–58`, `Salmo 144:1–15`],
         [`1sm 18:1—20:43`, `Salmo 59:1–17`], [`1sm 21:1—23:29`, `Salmo 52:1–9`], [`1sm 24:1—26:25`, `Salmo 54:1–7`],
         [`1sm 27:1—29:11`, `Salmo 57:1–11`], [`1sm 30:1—31:13`, `Salmo 18:35–50`], [`2sm 1:1—3:39`, `Salmo 56:1–13`],
         [`2sm 4:1—6:23`, `Salmo 24:1–10`], [`2sm 7:1—9:13`, `Salmo 89:1–18`], [`2sm 10:1—12:31`, `Salmo 51:1–19`],
         [`2sm 13:1—14:33`, `Salmo 55:1–15`], [`2sm 15:1—17:29`, `Salmo 3:1–8`], [`2sm 18:1—19:43`, `Salmo 4:1–8`],
-        [`2sm 20:1—21:22`, `Salmo 144:1–15`], [`2sm 22:1–51`, `Salmo 18:20–34`], [`2sm 23:1—24:25`, `Salmo 30:1–12`],
+        [`2sm 20:1—21:22`, `Salmo 144:1–15`], [`2sm 22:1—51`, `Salmo 18:20–34`], [`2sm 23:1—24:25`, `Salmo 30:1–12`],
         [`1rs 1:1—2:46`, `Salmo 101:1–8`], [`1rs 3:1—4:34`, `Salmo 119:97–104`], [`1rs 5:1—7:51`, `Salmo 87:1–7`],
-        [`1rs 8:1–66`, `Salmo 132:1–10`], [`1rs 9:1—11:43`, `Salmo 72:11–20`], [`1rs 12:1—14:31`, `Salmo 12:1–8`],
+        [`1rs 8:1—66`, `Salmo 132:1–10`], [`1rs 9:1—11:43`, `Salmo 72:11–20`], [`1rs 12:1—14:31`, `Salmo 12:1–8`],
         [`1rs 15:1—16:34`, `Salmo 82:1–8`], [`1rs 17:1—19:21`, `Salmo 27:1–6`], [`1rs 20:1—21:29`, `Salmo 5:1–12`],
         [`1rs 22:1–54`, `Salmo 97:1–12`],
         // Ano II - Sabado
         [`2rs 1:1—2:25`, `Salmo 68:1–18`], [`2rs 3:1—5:27`, `Salmo 107:31–43`], [`2rs 6:1—8:29`, `Salmo 91:1–16`],
         [`2rs 9:1—10:36`, `Salmo 5:1–12`], [`2rs 11:1—13:25`, `Salmo 20:1–9`], [`2rs 14:1—16:20`, `Salmo 78:56–72`],
-        [`2rs 17:1–41`, `Salmo 79:1–13`], [`2rs 18:1—19:37`, `Salmo 46:1–11`], [`2rs 20:1—22:20`, `Salmo 119:9–16`],
+        [`2rs 17:1—41`, `Salmo 79:1–13`], [`2rs 18:1—19:37`, `Salmo 46:1–11`], [`2rs 20:1—22:20`, `Salmo 119:9–16`],
         [`2rs 23:1—25:30`, `Salmo 74:1–12`], [`1cr 1:1—4:43`, `Salmo 105:1–15`], [`1cr 5:1—9:44`, `Salmo 132:1–10`],
         [`1cr 10:1—12:40`, `Salmo 57:1–11`], [`1cr 13:1—16:43`, `Salmo 105:1–15`], [`1cr 17:1—19:19`, `Salmo 89:1–18`],
         [`1cr 20:1—22:19`, `Salmo 127:1–5`], [`1cr 23:1—25:31`, `Salmo 135:1–21`], [`1cr 26:1—27:34`, `Salmo 84:1–12`],
-        [`1cr 28:1–21`, `Salmo 139:13–24`], [`1cr 29:1–30`, `Salmo 145:1–13`], [`2cr 1:1—3:17`, `Salmo 54:1–7`],
+        [`1cr 28:1—21`, `Salmo 139:13–24`], [`1cr 29:1—30`, `Salmo 145:1–13`], [`2cr 1:1—3:17`, `Salmo 54:1–7`],
         [`2cr 4:1—6:42`, `Salmo 132:1–18`], [`2cr 7:1—9:31`, `Salmo 99:1–9`], [`2cr 10:1—12:16`, `Salmo 3:1–8`],
         [`2cr 13:1—16:14`, `Salmo 9:1–20`], [`2cr 17:1—20:37`, `Salmo 60:1–12`], [`2cr 21:1—24:27`, `Salmo 78:1–16`],
         [`2cr 25:1—28:27`, `Salmo 76:1–12`], [`2cr 29:1—30:27`, `Salmo 100:1–5`], [`2cr 31:1—32:33`, `Salmo 121:1–8`],
         [`2cr 33:1—34:33`, `Salmo 51:1–19`], [`2cr 35:1—36:23`, `Salmo 126:1–6`], [`ed 1:1—3:13`, `Salmo 118:19–29`],
         [`ed 4:1—6:22`, `Salmo 138:1–8`], [`ed 7:1—8:36`, `Salmo 119:97–104`], [`ed 9:1—10:44`, `Salmo 102:1–28`],
         [`ne 1:1—3:32`, `Salmo 122:1–9`], [`ne 4:1—6:19`, `Salmo 59:1–17`], [`ne 7:1—8:18`, `Salmo 19:7–14`],
-        [`ne 9:1—10:39`, `Salmo 143:1–12`], [`ne 11:1—12:47`, `Salmo 147:1–20`], [`ne 13:1–31`, `Salmo 92:1–15`],
+        [`ne 9:1—10:39`, `Salmo 143:1–12`], [`ne 11:1—12:47`, `Salmo 147:1–20`], [`ne 13:1—31`, `Salmo 92:1–15`],
         [`et 1:1—2:23`, `Salmo 45:1–9`], [`et 3:1—4:17`, `Salmo 83:1–18`], [`et 5:1—7:10`, `Salmo 52:1–9`],
         [`et 8:1—10:3`, `Salmo 124:1–8`], [`1cr 16:7–36`, `Salmo 66:1–20`], [`1cr 29:10–20`, `Salmo 71:1–24`],
         [`ne 8:1–18`, `Salmo 19:7–14`], [`ne 9:1–38`, `Salmo 106:1–12`], [`2cr 6:14–42`, `Salmo 86:1–17`],
@@ -1068,7 +1138,7 @@
         // Ano II - Segunda
         [`hb 1:1—2:18`, `Salmo 2:1–12`], [`hb 3:1—4:13`, `Salmo 95:1–11`], [`hb 4:14—6:20`, `Salmo 110:1–7`],
         [`hb 7:1–28`, `Salmo 110:1–4`], [`hb 8:1—9:28`, `Salmo 89:1–18`], [`hb 10:1–39`, `Salmo 40:6–10`],
-        [`hb 11:1–40`, `Salmo 105:1–15`], [`hb 12:1–29`, `Salmo 118:1–18`], [`hb 13:1–25`, `Salmo 133:1–3`],
+        [`hb 11:1—40`, `Salmo 105:1–15`], [`hb 12:1—29`, `Salmo 118:1–18`], [`hb 13:1–25`, `Salmo 133:1–3`],
         [`tg 1:1—2:26`, `Salmo 1:1–6`], [`tg 3:1—5:20`, `Salmo 141:1–10`], [`1pe 1:1—2:25`, `Salmo 34:11–22`],
         [`1pe 3:1—5:14`, `Salmo 34:1–10`], [`2pe 1:1—3:18`, `Salmo 90:1–12`], [`1jo 1:1—3:10`, `Salmo 133:1–3`],
         [`1jo 3:11—5:21`, `Salmo 118:1–14`], [`2jo 1–13; 3jo 1–15; jd 1–25`, `Salmo 119:1–16`],
@@ -1076,12 +1146,12 @@
         [`at 9:1—10:48`, `Salmo 18:1–19`], [`at 11:1—12:25`, `Salmo 34:1–10`], [`at 13:1—14:28`, `Salmo 96:1–13`],
         [`at 15:1—16:40`, `Salmo 119:49–64`], [`at 17:1—18:22`, `Salmo 19:1–6`], [`at 18:23—20:38`, `Salmo 23:1–6`],
         [`at 21:1—22:30`, `Salmo 27:1–14`], [`at 23:1—24:27`, `Salmo 56:1–13`], [`at 25:1—26:32`, `Salmo 119:41–48`],
-        [`at 27:1—44`, `Salmo 107:23–32`], [`at 28:1–31`, `Salmo 98:1–9`], [`ap 1:1–20`, `Salmo 110:1–7`],
+        [`at 27:1—44`, `Salmo 107:23–32`], [`at 28:1—31`, `Salmo 98:1–9`], [`ap 1:1–20`, `Salmo 110:1–7`],
         [`ap 2:1—3:22`, `Salmo 15:1–5`], [`ap 4:1—5:14`, `Salmo 99:1–9`], [`ap 6:1—7:17`, `Salmo 96:1–13`],
         [`ap 8:1—9:21`, `Salmo 141:1–4`], [`ap 10:1—11:19`, `Salmo 97:1–12`], [`ap 12:1—13:18`, `Salmo 118:1–14`],
-        [`ap 14:1—15:8`, `Salmo 145:1–13`], [`ap 16:1–21`, `Salmo 140:1–13`], [`ap 17:1—18:24`, `Salmo 75:1–10`],
-        [`ap 19:1–21`, `Salmo 45:1–17`], [`ap 20:1–15`, `Salmo 28:1–9`], [`ap 21:1–27`, `Salmo 87:1–7`],
-        [`ap 22:1–21`, `Salmo 46:1–11`], [`rm 8:18–39`, `Salmo 23:1–6`], [`ef 1:3–14; 2:1–10`, `Salmo 103:1–14`],
+        [`ap 14:1—15:8`, `Salmo 145:1–13`], [`ap 16:1—21`, `Salmo 140:1–13`], [`ap 17:1—18:24`, `Salmo 75:1–10`],
+        [`ap 19:1—21`, `Salmo 45:1–17`], [`ap 20:1—15`, `Salmo 28:1–9`], [`ap 21:1—27`, `Salmo 87:1–7`],
+        [`ap 22:1—21`, `Salmo 46:1–11`], [`rm 8:18–39`, `Salmo 23:1–6`], [`ef 1:3–14; 2:1–10`, `Salmo 103:1–14`],
         [`fp 2:5–11; cl 1:15–20`, `Salmo 110:1–7`], [`1co 15:50–58`, `Salmo 118:1–18`], [`hb 11:1—12:2`, `Salmo 105:1–15`],
         [`ap 1:4–8`, `Salmo 93:1–5`], [`ap 21:1—22:5`, `Salmo 148:1–14`]
       ],
@@ -1090,7 +1160,7 @@
         [`is 9:1—10:34`, `Salmo 89:1–18`], [`is 11:1—12:6`, `Salmo 72:1–10`], [`is 13:1—14:32`, `Salmo 76:1–12`],
         [`is 15:1—19:25`, `Salmo 68:19–35`], [`is 20:1—23:18`, `Salmo 46:1–11`], [`is 24:1—27:13`, `Salmo 30:1–12`],
         [`is 28:1—29:24`, `Salmo 118:19–29`], [`is 30:1—33:24`, `Salmo 62:1–12`], [`is 34:1—35:10`, `Salmo 65:1–13`],
-        [`is 36:1—39:8`, `Salmo 48:1–14`], [`is 40:1–31`, `Salmo 103:1–14`], [`is 41:1—42:25`, `Salmo 89:19–29`],
+        [`is 36:1—39:8`, `Salmo 48:1–14`], [`is 40:1—31`, `Salmo 103:1–14`], [`is 41:1—42:25`, `Salmo 89:19–29`],
         [`is 43:1—44:28`, `Salmo 122:1–9`], [`is 45:1—48:22`, `Salmo 98:1–9`], [`is 49:1—50:11`, `Salmo 22:1–18`],
         [`is 51:1—52:12`, `Salmo 70:1–5`], [`is 52:13—53:12`, `Salmo 30:1–12`], [`is 54:1—55:13`, `Salmo 63:1–11`],
         [`is 56:1—59:21`, `Salmo 58:1–11`], [`is 60:1—62:12`, `Salmo 108:1–13`], [`is 63:1—64:12`, `Salmo 79:1–13`],
@@ -1107,7 +1177,7 @@
         // Ano II - Terca
         [`ez 1:1—3:27`, `Salmo 104:1–10`], [`ez 4:1—7:27`, `Salmo 79:1–13`], [`ez 8:1—11:25`, `Salmo 74:1–12`],
         [`ez 12:1—15:8`, `Salmo 11:1–7`], [`ez 16:1–63`, `Salmo 106:1–15`], [`ez 17:1—19:14`, `Salmo 80:8–19`],
-        [`ez 20:1–49`, `Salmo 106:16–31`], [`ez 21:1—23:49`, `Salmo 21:1–13`], [`ez 24:1—25:17`, `Salmo 30:1–12`],
+        [`ez 20:1—49`, `Salmo 106:16–31`], [`ez 21:1—23:49`, `Salmo 21:1–13`], [`ez 24:1—25:17`, `Salmo 30:1–12`],
         [`ez 26:1—28:26`, `Salmo 29:1–11`], [`ez 29:1—32:32`, `Salmo 76:1–12`], [`ez 33:1—34:31`, `Salmo 33:12–22`],
         [`ez 35:1—36:38`, `Salmo 36:1–12`], [`ez 37:1–28`, `Salmo 104:24–35`], [`ez 38:1—39:29`, `Salmo 46:1–11`],
         [`ez 40:1—42:20`, `Salmo 48:1–14`], [`ez 43:1—44:31`, `Salmo 24:1–10`], [`ez 45:1—46:24`, `Salmo 70:1–5`],
@@ -1127,7 +1197,7 @@
       3: [
         [`pv 1:1–33`, `Salmo 25:1–10`], [`pv 2:1—3:35`, `Salmo 1:1–6`], [`pv 4:1—5:23`, `Salmo 119:9–16`],
         [`pv 6:1—7:27`, `Salmo 19:7–14`], [`pv 8:1–36`, `Salmo 104:24–35`], [`pv 9:1–18`, `Salmo 34:1–10`],
-        [`pv 10:1–32`, `Salmo 37:1–11`], [`pv 11:1–31`, `Salmo 36:1–12`], [`pv 12:1–28`, `Salmo 141:1–10`],
+        [`pv 10:1–32`, `Salmo 37:1–11`], [`pv 11:1—31`, `Salmo 36:1–12`], [`pv 12:1–28`, `Salmo 141:1–10`],
         [`pv 13:1–25`, `Salmo 97:1–12`], [`pv 14:1–35`, `Salmo 128:1–6`], [`pv 15:1–33`, `Salmo 37:12–22`],
         [`pv 16:1–33`, `Salmo 37:23–40`], [`pv 17:1–28`, `Salmo 66:1–12`], [`pv 18:1–24`, `Salmo 61:1–8`],
         [`pv 19:1–29`, `Salmo 41:1–13`], [`pv 20:1–30`, `Salmo 119:105–112`], [`pv 21:1–31`, `Salmo 50:7–23`],
@@ -1288,7 +1358,6 @@
     }
 
     function parsePericopeChapters(compactRef) {
-      // Retorna lista de objetos { bookId, chapters: [int...] }
       const segments = compactRef.split(`;`);
       const result = [];
       let lastBookId = null;
@@ -1309,13 +1378,11 @@
         }
         const book = BOOK_MAP[bookId];
 
-        // Livros de 1 capitulo (fm, ob, jd, 2jo, 3jo)
         if (book.ch === 1) {
           result.push({ bookId: bookId, chapters: [1] });
           return;
         }
 
-        // Caso multi-capitulo com travessao: ex "1:1—2:3" ou "31:1—32:35" ou "8:27—10:45"
         const crossMatch = rest.match(/^(\d+):[^—]+—(\d+):.+$/);
         if (crossMatch) {
           const startCh = parseInt(crossMatch[1], 10);
@@ -1326,7 +1393,6 @@
           return;
         }
 
-        // Caso capitulo unico com versos: ex "1:1–20" ou "40:1–38"
         const singleMatch = rest.match(/^(\d+)(?::.+)?$/);
         if (singleMatch) {
           result.push({ bookId: bookId, chapters: [parseInt(singleMatch[1], 10)] });
@@ -1335,7 +1401,6 @@
       return result;
     }
 
-    // Construcao da estrutura normalizada do plano
     const PLAN = {};
     const BOOK_TO_READING_IDS = {};
     BOOKS.forEach(function (b) { BOOK_TO_READING_IDS[b.id] = []; });
@@ -1379,17 +1444,89 @@
     });
 
     // =========================================================================
-    // 4. ESTADO DO APLICATIVO E PERSISTENCIA VIA notebookAppApi
+    // 4. ESTADO DO APLICATIVO E PERSISTENCIA (LOCALSTORAGE + NOTEBOOKAPPAPI)
     // =========================================================================
+    const STORAGE_KEY = `kalendar_liturgico_digital_state_v1`;
+    let memoryFallbackState = null;
+
     let appState = {
-      completedReadings: [], // array de IDs ex: ["4-0", "5-0"]
-      readChapters: {},      // mapa bookId -> array de capitulos inteiros lidos ex: { gn: [1,2] }
+      completedReadings: [],
+      readChapters: {},
       selectedOfficeDay: null,
       selectedPeriod: null
     };
 
     let activeTab = `office`;
     let expandedBooks = {};
+
+    function sanitizeSavedState(raw) {
+      if (!raw || typeof raw !== `object`) return null;
+      const clean = {};
+      if (Array.isArray(raw.completedReadings)) {
+        clean.completedReadings = raw.completedReadings.filter(function (id) {
+          return typeof id === `string`;
+        });
+      }
+      if (raw.readChapters && typeof raw.readChapters === `object` && !Array.isArray(raw.readChapters)) {
+        const cleanChapters = {};
+        Object.keys(raw.readChapters).forEach(function (bookId) {
+          if (BOOK_MAP[bookId] && Array.isArray(raw.readChapters[bookId])) {
+            cleanChapters[bookId] = raw.readChapters[bookId]
+              .map(function (n) { return parseInt(n, 10); })
+              .filter(function (n, i, arr) {
+                return Number.isInteger(n) && n >= 1 && n <= BOOK_MAP[bookId].ch && arr.indexOf(n) === i;
+              })
+              .sort(function (a, b) { return a - b; });
+          }
+        });
+        clean.readChapters = cleanChapters;
+      }
+      if (typeof raw.selectedOfficeDay === `number` && DAY_INFO[raw.selectedOfficeDay]) {
+        clean.selectedOfficeDay = raw.selectedOfficeDay;
+      }
+      if (raw.selectedPeriod === `morning` || raw.selectedPeriod === `evening`) {
+        clean.selectedPeriod = raw.selectedPeriod;
+      }
+      return clean;
+    }
+
+    function readLocalStorageState() {
+      try {
+        if (typeof window.localStorage === `undefined` || window.localStorage === null) {
+          return memoryFallbackState;
+        }
+        const rawStr = window.localStorage.getItem(STORAGE_KEY);
+        if (!rawStr) return memoryFallbackState;
+        return sanitizeSavedState(JSON.parse(rawStr));
+      } catch (err) {
+        return memoryFallbackState;
+      }
+    }
+
+    function writeLocalStorageState(stateObj) {
+      memoryFallbackState = {
+        completedReadings: Array.isArray(stateObj.completedReadings) ? stateObj.completedReadings.slice() : [],
+        readChapters: JSON.parse(JSON.stringify(stateObj.readChapters || {})),
+        selectedOfficeDay: stateObj.selectedOfficeDay,
+        selectedPeriod: stateObj.selectedPeriod
+      };
+      try {
+        if (typeof window.localStorage !== `undefined` && window.localStorage !== null) {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(memoryFallbackState));
+        }
+      } catch (err) {
+        // Em contextos file:// restritos onde localStorage pode lançar SecurityError, mantém fallback em memória
+      }
+    }
+
+    function applySavedState(saved) {
+      const clean = sanitizeSavedState(saved);
+      if (!clean) return;
+      if (Array.isArray(clean.completedReadings)) appState.completedReadings = clean.completedReadings;
+      if (clean.readChapters) appState.readChapters = clean.readChapters;
+      if (typeof clean.selectedOfficeDay === `number`) appState.selectedOfficeDay = clean.selectedOfficeDay;
+      if (clean.selectedPeriod) appState.selectedPeriod = clean.selectedPeriod;
+    }
 
     function isReadingCompleted(id) {
       return appState.completedReadings.indexOf(id) !== -1;
@@ -1400,10 +1537,6 @@
       return Array.isArray(list) && list.indexOf(ch) !== -1;
     }
 
-    // Regra especial:
-    // Pula pericope SOMENTE se TODOS os capitulos da pericope estiverem marcados como lidos.
-    // Se houver pelo menos um capitulo ainda nao lido, NAO deve ser pulada.
-    // Leituras de Domingo nunca sao afetadas por livros/capitulos marcados na configuracao.
     function isReadingSkippedByConfig(reading) {
       if (reading.isSunday || !reading.parts || reading.parts.length === 0) return false;
       for (let i = 0; i < reading.parts.length; i++) {
@@ -1429,7 +1562,6 @@
       return null;
     }
 
-    // Ao concluir todas as pericopes de um livro no plano, marca o livro automaticamente como lido na configuracao
     function syncAutoCompletedBooks() {
       BOOKS.forEach(function (book) {
         const reqIds = BOOK_TO_READING_IDS[book.id] || [];
@@ -1446,6 +1578,7 @@
     }
 
     async function persistState() {
+      writeLocalStorageState(appState);
       try {
         if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
           await window.notebookAppApi.setAppState(appState);
@@ -1578,6 +1711,20 @@
           encoding: `UTF-8`,
           filename: `kalendar-progresso.json`
         });
+      } else {
+        try {
+          const blob = new Blob([payload], { type: `application/json;charset=utf-8` });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement(`a`);
+          link.href = url;
+          link.download = `kalendar-progresso.json`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        } catch (err) {
+          console.error(`Erro ao baixar backup:`, err);
+        }
       }
       const fb = document.getElementById(`config-feedback`);
       if (fb) {
@@ -1804,7 +1951,7 @@
             <div class="plan-index">#` + String(r.index + 1).padStart(3, `0`) + `</div>
             <div>
               <div class="plan-main-ref">` + titleText + `</div>
-              <div class="plan-psalm-ref">` + r.psalm + ` ` + badgeHtml + `</div>
+              <div class="plan-psalm-ref"><span>` + r.psalm + `</span> ` + badgeHtml + `</div>
             </div>
             <div>
               <button type="button" class="btn btn-secondary btn-small" onclick="toggleReadingInPlan('` + r.id + `')">` + btnLabel + `</button>
@@ -1867,7 +2014,7 @@
                 <label class="book-name" for="chk-book-` + b.id + `">` + b.name + `</label>
                 <span class="badge">` + dayInfo.short + `</span>
               </div>
-              <div style="display:flex; align-items:center; gap: var(--space-md);">
+              <div class="book-actions-wrap">
                 <span class="book-progress-text">` + readList.length + ` / ` + b.ch + ` cap.</span>
                 <button type="button" class="btn btn-secondary btn-small" onclick="toggleBookExpand('` + b.id + `')">` + (isExpanded ? `Ocultar capítulos` : `Capítulos`) + `</button>
               </div>
@@ -1884,14 +2031,24 @@
     // 7. INICIALIZACAO
     // =========================================================================
     async function initApp() {
+      const localSaved = readLocalStorageState();
+      if (localSaved) {
+        applySavedState(localSaved);
+      }
+
       try {
         if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
-          const saved = await window.notebookAppApi.getAppState();
-          if (saved && typeof saved === `object`) {
-            if (Array.isArray(saved.completedReadings)) appState.completedReadings = saved.completedReadings;
-            if (saved.readChapters && typeof saved.readChapters === `object`) appState.readChapters = saved.readChapters;
-            if (typeof saved.selectedOfficeDay === `number`) appState.selectedOfficeDay = saved.selectedOfficeDay;
-            if (saved.selectedPeriod === `morning` || saved.selectedPeriod === `evening`) appState.selectedPeriod = saved.selectedPeriod;
+          const apiSaved = await window.notebookAppApi.getAppState();
+          const cleanApi = sanitizeSavedState(apiSaved);
+          if (cleanApi) {
+            const apiHasProgress = (cleanApi.completedReadings && cleanApi.completedReadings.length > 0) ||
+              (cleanApi.readChapters && Object.keys(cleanApi.readChapters).length > 0);
+            const localHasProgress = (appState.completedReadings && appState.completedReadings.length > 0) ||
+              (appState.readChapters && Object.keys(appState.readChapters).length > 0);
+
+            if (apiHasProgress || !localHasProgress) {
+              applySavedState(cleanApi);
+            }
           }
         }
       } catch (err) {
@@ -1902,6 +2059,8 @@
       const now = new Date();
       appState.selectedOfficeDay = now.getDay();
       appState.selectedPeriod = now.getHours() < 12 ? `morning` : `evening`;
+
+      writeLocalStorageState(appState);
 
       const planFilter = document.getElementById(`plan-day-filter`);
       if (planFilter) planFilter.value = String(appState.selectedOfficeDay);
