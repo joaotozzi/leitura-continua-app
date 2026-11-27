@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="sonnet">
+  <title>Leitura Conínua App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces (Sonnet) */
+      --background: #f5efe0;
+      --surface-container-low: #f8f3e7;
+      --surface-container: #ece3cf;
+      --surface-container-high: #e4d8bf;
+
+      /* Ink */
+      --on-surface: #1f1a17;
+      --on-surface-variant: #4a3f38;
+
+      /* Rules */
+      --outline: #a8843f;
+      --outline-variant: #d8c7a3;
+
+      /* Accents */
+      --primary: #6b1424;
+      --on-primary: #f5efe0;
+      --primary-container: #efe0dc;
+      --on-primary-container: #4a0d18;
+      --secondary: #2f4a3a;
+      --secondary-container: #e3ece6;
+      --tertiary: #a8843f;
+      --error: #9b2c1f;
+      --on-error: #f5efe0;
+
+      /* Data series */
+      --data-1: #6b1424;
+      --data-2: #2f4a3a;
+      --data-3: #a8843f;
+      --data-4: #3d5a73;
+      --data-context: #b9ad9c;
+
+      /* Semantic */
+      --positive: #2f4a3a;
+      --warning: #8c5a16;
+      --focus: #6b1424;
+
+      /* Fonts */
+      --font-headline: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Crimson Pro', Georgia, serif;
+      --font-label: 'Cormorant Garamond', Georgia, serif;
+
+      /* Type scale (tool) */
+      --display-size: clamp(1.85rem, 1.4rem + 1.4vw, 2.5rem);
+      --headline-size: clamp(1.35rem, 1.15rem + 0.6vw, 1.65rem);
+      --subhead-size: clamp(1.125rem, 1.02rem + 0.3vw, 1.25rem);
+      --body-size: clamp(1rem, 0.96rem + 0.2vw, 1.08rem);
+      --label-size: 0.78rem;
+
+      /* Shape */
+      --rounded: 0;
+      --rounded-lg: 0;
+      --rounded-full: 9999px;
+
+      /* Spacing scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+
+      /* Style effects */
+      --gilt-rule: 1px solid var(--outline);
+      --gilt-hairline: 1px solid var(--outline-variant);
+      --gilt-frame-inset: 5px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.62;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .app-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-lg) var(--space-md) var(--space-2xl);
+    }
+    .app-shell * { min-width: 0; }
+
+    /* Centered liturgical masthead (Sonnet) */
+    .masthead {
+      text-align: center;
+      padding: var(--space-lg) var(--space-md);
+      border: var(--gilt-rule);
+      outline: var(--gilt-rule);
+      outline-offset: calc(-1 * var(--gilt-frame-inset));
+      background-color: var(--surface-container-low);
+      margin-bottom: var(--space-lg);
+    }
+
+    .masthead-kicker {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin: 0 0 var(--space-xs);
+    }
+
+    .masthead-title {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-style: italic;
+      font-size: var(--display-size);
+      line-height: 1.1;
+      letter-spacing: -0.005em;
+      color: var(--on-surface);
+      margin: 0 0 var(--space-xs);
+    }
+
+    .masthead-sub {
+      font-size: var(--body-size);
+      color: var(--on-surface-variant);
+      margin: 0;
+    }
+
+    /* Navigation tabs */
+    .nav-bar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      border-top: var(--gilt-hairline);
+      border-bottom: var(--gilt-rule);
+      padding: var(--space-sm) 0;
+      margin-bottom: var(--space-lg);
+    }
+
+    .nav-tab {
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: transparent;
+      border: 1px solid transparent;
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      transition: color var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+
+    .nav-tab:hover {
+      color: var(--primary);
+      background-color: var(--surface-container-low);
+    }
+
+    .nav-tab.is-active {
+      color: var(--on-primary);
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.is-active {
+      display: block;
+      animation: fadeRise var(--dur-short) var(--ease-out) both;
+    }
+
+    @keyframes fadeRise {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Summary metrics strip */
+    .metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+      gap: var(--space-md);
+      border-block: var(--gilt-rule);
+      padding: var(--space-md) 0;
+      margin-bottom: var(--space-lg);
+    }
+
+    .metric-cell {
+      text-align: center;
+      padding: var(--space-xs) var(--space-sm);
+    }
+
+    .metric-label {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .metric-value {
+      font-family: var(--font-headline);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1.65rem;
+      line-height: 1.15;
+      font-variant-numeric: lining-nums tabular-nums;
+      color: var(--on-surface);
+    }
+
+    .metric-note {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--on-surface-variant);
+    }
+
+    /* Controls row */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      flex: 1 1 200px;
+    }
+
+    .field-label {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+
+    .field-select, .field-input {
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background-color: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-bottom: 1px solid var(--on-surface-variant);
+      color: var(--on-surface);
+    }
+
+    .field-select {
+      padding-right: var(--space-xl);
+    }
+
+    /* Buttons */
+    .btn {
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-lg);
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--on-primary);
+    }
+    .btn-primary:hover { background-color: var(--on-primary-container); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--primary);
+    }
+    .btn-secondary:hover {
+      background-color: var(--primary-container);
+    }
+
+    .btn-small {
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      font-size: var(--label-size);
+    }
+
+    /* Toggle pill group for Manhã / Tarde */
+    .segmented-toggle {
+      display: inline-flex;
+      border: 1px solid var(--outline);
+    }
+    .segmented-btn {
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      background: transparent;
+      border: none;
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+    }
+    .segmented-btn.is-active {
+      background-color: var(--primary);
+      color: var(--on-primary);
+    }
+
+    /* Office layout */
+    .office-header {
+      text-align: center;
+      padding-bottom: var(--space-md);
+      border-bottom: var(--gilt-hairline);
+      margin-bottom: var(--space-lg);
+    }
+
+    .office-day-tag {
+      display: inline-block;
+      padding: var(--space-xs) var(--space-md);
+      border: 1px solid var(--secondary);
+      border-radius: var(--rounded-full);
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .office-title {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-style: italic;
+      font-size: var(--headline-size);
+      margin: 0 0 var(--space-xs);
+    }
+
+    .office-meta {
+      color: var(--on-surface-variant);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .liturgy-block {
+      padding: var(--space-md) 0;
+      border-bottom: var(--gilt-hairline);
+    }
+
+    .liturgy-block:last-of-type {
+      border-bottom: var(--gilt-rule);
+    }
+
+    .liturgy-label {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin: 0 0 var(--space-xs);
+    }
+
+    .reading-callout {
+      background-color: var(--surface-container-low);
+      border-left: 3px solid var(--primary);
+      padding: var(--space-md) var(--space-lg);
+      margin: var(--space-sm) 0;
+    }
+
+    .reading-ref {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.35rem;
+      line-height: 1.25;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .reading-sub {
+      color: var(--on-surface-variant);
+      font-size: 0.95rem;
+      margin: var(--space-xs) 0 0;
+    }
+
+    .sunday-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-sm);
+    }
+
+    .sunday-item {
+      border-top: var(--gilt-hairline);
+      padding-top: var(--space-xs);
+    }
+
+    .sunday-item-label {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--secondary);
+    }
+
+    .sunday-item-ref {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: var(--on-surface);
+    }
+
+    .rubric-box {
+      border-left: 2px solid var(--outline);
+      background-color: var(--surface-container-low);
+      padding: var(--space-md) var(--space-lg);
+      font-family: var(--font-headline);
+      font-style: italic;
+      font-size: 1.12rem;
+      color: var(--secondary);
+      margin: var(--space-sm) 0;
+    }
+
+    .prayer-text {
+      max-width: 65ch;
+      margin: var(--space-xs) 0 0;
+      color: var(--on-surface);
+    }
+
+    .prayer-response {
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+
+    .office-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+      padding: var(--space-md);
+      background-color: var(--surface-container-low);
+      border: var(--gilt-hairline);
+    }
+
+    .status-banner {
+      padding: var(--space-sm) var(--space-md);
+      margin-top: var(--space-md);
+      border-left: 3px solid var(--secondary);
+      background-color: var(--secondary-container);
+      color: var(--secondary);
+      font-size: 0.95rem;
+      display: none;
+    }
+    .status-banner.is-visible { display: block; }
+
+    /* Plan table/list */
+    .plan-list {
+      display: flex;
+      flex-direction: column;
+      border-top: var(--gilt-rule);
+    }
+
+    .plan-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: var(--space-md);
+      align-items: center;
+      padding: var(--space-md) var(--space-sm);
+      border-bottom: var(--gilt-hairline);
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+
+    .plan-row:hover {
+      background-color: var(--surface-container-low);
+    }
+
+    .plan-row.is-current {
+      background-color: var(--primary-container);
+      border-left: 3px solid var(--primary);
+    }
+
+    .plan-row.is-done {
+      opacity: 0.78;
+    }
+
+    .plan-index {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--label-size);
+      letter-spacing: 0.1em;
+      color: var(--on-surface-variant);
+      font-variant-numeric: tabular-nums;
+      min-width: 2.5rem;
+    }
+
+    .plan-main-ref {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: var(--on-surface);
+    }
+
+    .plan-psalm-ref {
+      font-size: 0.92rem;
+      color: var(--on-surface-variant);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px var(--space-sm);
+      border-radius: var(--rounded-full);
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid var(--outline-variant);
+      color: var(--on-surface-variant);
+      white-space: nowrap;
+    }
+
+    .badge-read {
+      border-color: var(--secondary);
+      background-color: var(--secondary-container);
+      color: var(--secondary);
+    }
+
+    .badge-skipped {
+      border-color: var(--outline);
+      background-color: var(--surface-container);
+      color: var(--on-surface-variant);
+    }
+
+    .badge-current {
+      border-color: var(--primary);
+      background-color: var(--primary);
+      color: var(--on-primary);
+    }
+
+    /* Config books & chapters */
+    .book-card {
+      border-top: var(--gilt-hairline);
+      padding: var(--space-md) 0;
+    }
+
+    .book-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+
+    .book-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      flex: 1 1 200px;
+    }
+
+    .book-check {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .book-name {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.18rem;
+      cursor: pointer;
+    }
+
+    .book-progress-text {
+      font-size: 0.88rem;
+      color: var(--on-surface-variant);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+      gap: var(--space-xs);
+      margin-top: var(--space-md);
+      padding: var(--space-sm);
+      background-color: var(--surface-container-low);
+      border: var(--gilt-hairline);
+    }
+
+    .chap-btn {
+      min-height: 44px;
+      min-width: 44px;
+      border: 1px solid var(--outline-variant);
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-size: 0.88rem;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+
+    .chap-btn:hover {
+      border-color: var(--primary);
+    }
+
+    .chap-btn.is-read {
+      background-color: var(--secondary);
+      border-color: var(--secondary);
+      color: var(--on-primary);
+      font-weight: 600;
+    }
+
+    .footer-note {
+      margin-top: var(--space-xl);
+      padding-top: var(--space-md);
+      border-top: var(--gilt-hairline);
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--on-surface-variant);
+    }
+
+    .empty-state {
+      padding: var(--space-xl) var(--space-md);
+      text-align: center;
+      border: var(--gilt-hairline);
+      background-color: var(--surface-container-low);
+    }
+
+    @media (max-width: 640px) {
+      .app-shell { padding: var(--space-sm) var(--space-sm) var(--space-xl); }
+      .masthead { padding: var(--space-md) var(--space-sm); }
+      .nav-bar { gap: var(--space-xs); }
+      .nav-tab { flex: 1 1 auto; text-align: center; font-size: 0.75rem; padding: var(--space-xs) var(--space-sm); }
+      .plan-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); }
+      .office-actions { flex-direction: column; align-items: stretch; }
+      .btn { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="masthead">
+      <p class="masthead-kicker">Plano de Leitura Bíblica · Orando a Escritura</p>
+      <h1 class="masthead-title">Leitura Bíblica Contínua</h1>
+      <p class="masthead-sub">Ofício diário simplificado, rotação semanal de gêneros e acompanhamento integral dos 66 livros</p>
+    </header>
+
+    <nav class="nav-bar" aria-label="Navegação principal">
+      <button type="button" class="nav-tab is-active" id="tab-btn-office" onclick="switchTab('office')">Ofício Hoje</button>
+      <button type="button" class="nav-tab" id="tab-btn-plan" onclick="switchTab('plan')">Plano Completo</button>
+      <button type="button" class="nav-tab" id="tab-btn-config" onclick="switchTab('config')">Livros &amp; Capítulos</button>
+    </nav>
+
+    <section class="metrics-strip" aria-label="Resumo do progresso">
+      <div class="metric-cell">
+        <div class="metric-label">Leituras Concluídas</div>
+        <div class="metric-value" id="metric-readings">0 / 728</div>
+        <div class="metric-note" id="metric-readings-pct">0% do ciclo bienal</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Livros Concluídos</div>
+        <div class="metric-value" id="metric-books">0 / 65</div>
+        <div class="metric-note">Excluindo Saltério</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Dia da Semana</div>
+        <div class="metric-value" id="metric-weekday">—</div>
+        <div class="metric-note" id="metric-genre">—</div>
+      </div>
+    </section>
+
+    <!-- ABA 1: OFÍCIO HOJE -->
+    <main id="panel-office" class="tab-panel is-active">
+      <div class="controls-row">
+        <div class="field-group">
+          <label for="office-day-select" class="field-label">Dia do Ofício</label>
+          <select id="office-day-select" class="field-select" onchange="onOfficeDayChange(this.value)">
+            <option value="4">Quinta-feira — A Torá</option>
+            <option value="5">Sexta-feira — Evangelhos</option>
+            <option value="6">Sábado — História de Israel</option>
+            <option value="0">Domingo — Lecionário</option>
+            <option value="1">Segunda-feira — Atos e Epístolas</option>
+            <option value="2">Terça-feira — Os Profetas</option>
+            <option value="3">Quarta-feira — Literatura Sapiencial</option>
+          </select>
+        </div>
+
+        <div class="field-group" style="flex: 0 0 auto;">
+          <span class="field-label">Momento da Coleta</span>
+          <div class="segmented-toggle" role="group" aria-label="Selecionar coleta da manhã ou da tarde">
+            <button type="button" class="segmented-btn" id="btn-period-morning" onclick="setOfficePeriod('morning')">Manhã</button>
+            <button type="button" class="segmented-btn" id="btn-period-evening" onclick="setOfficePeriod('evening')">Tarde</button>
+          </div>
+        </div>
+      </div>
+
+      <article id="office-content"></article>
+      <div id="office-feedback" class="status-banner" role="status" aria-live="polite"></div>
+    </main>
+
+    <!-- ABA 2: PLANO COMPLETO -->
+    <section id="panel-plan" class="tab-panel" aria-label="Visualização completa do plano">
+      <div class="controls-row">
+        <div class="field-group">
+          <label for="plan-day-filter" class="field-label">Dia da Semana (Rotação)</label>
+          <select id="plan-day-filter" class="field-select" onchange="renderPlanTab()">
+            <option value="4">Quinta-feira — Torá (104 leituras)</option>
+            <option value="5">Sexta-feira — Evangelhos (104 leituras)</option>
+            <option value="6">Sábado — História de Israel (104 leituras)</option>
+            <option value="0">Domingo — Lecionário (104 domingos)</option>
+            <option value="1">Segunda-feira — Atos e Epístolas (104 leituras)</option>
+            <option value="2">Terça-feira — Profetas (104 leituras)</option>
+            <option value="3">Quarta-feira — Literatura Sapiencial (104 leituras)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="plan-status-filter" class="field-label">Exibir</label>
+          <select id="plan-status-filter" class="field-select" onchange="renderPlanTab()">
+            <option value="all">Todas as leituras</option>
+            <option value="pending">Pendentes / Atual</option>
+            <option value="done">Já lidas ou puladas</option>
+          </select>
+        </div>
+      </div>
+      <div id="plan-summary" class="office-meta" style="margin-bottom: var(--space-md);"></div>
+      <div id="plan-list" class="plan-list"></div>
+    </section>
+
+    <!-- ABA 3: CONFIGURAÇÃO DE LIVROS E CAPÍTULOS -->
+    <section id="panel-config" class="tab-panel" aria-label="Configuração de livros e capítulos lidos">
+      <div class="controls-row">
+        <div class="field-group">
+          <label for="config-search" class="field-label">Filtrar Livro</label>
+          <input id="config-search" type="text" class="field-input" placeholder="Ex.: Gênesis, Marcos, Isaías…" oninput="renderConfigTab()">
+        </div>
+        <div class="field-group">
+          <label for="config-genre-filter" class="field-label">Gênero / Dia</label>
+          <select id="config-genre-filter" class="field-select" onchange="renderConfigTab()">
+            <option value="all">Todos os 65 livros (sem Salmos)</option>
+            <option value="4">Torá (Quinta)</option>
+            <option value="5">Evangelhos (Sexta)</option>
+            <option value="6">História de Israel (Sábado)</option>
+            <option value="1">Atos e Epístolas (Segunda)</option>
+            <option value="2">Profetas (Terça)</option>
+            <option value="3">Sabedoria (Quarta)</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="office-meta" style="margin-bottom: var(--space-md);">
+        Marque livros inteiros ou expanda para marcar capítulos individuais já lidos. O plano sequencial pula perícopes em que <strong>todos</strong> os capítulos já foram lidos; se houver ao menos um capítulo não lido, a perícope permanece no plano. Leituras de Domingo são independentes desta lista.
+      </p>
+
+      <div class="controls-row" style="margin-bottom: var(--space-md);">
+        <div style="display:flex; flex-wrap:wrap; gap: var(--space-sm);">
+          <button type="button" class="btn btn-secondary btn-small" onclick="exportProgressBackup()">Exportar Backup (JSON)</button>
+          <button type="button" class="btn btn-secondary btn-small" onclick="resetAllProgress(this)">Zerar Todo o Progresso</button>
+        </div>
+      </div>
+      <div id="config-feedback" class="status-banner" role="status" aria-live="polite"></div>
+      <div id="config-books-list"></div>
+    </section>
+
+    <footer class="footer-note">
+    </footer>
+  </div>
+
+  <api-shim></api-shim>
+  <script>
+    // =========================================================================
+    // 1. CATALOGO DOS 65 LIVROS (SEM SALMOS) E METADADOS LITURGICOS
+    // =========================================================================
+    const BOOKS = [
+      // Quinta: Tora (4)
+      { id: `gn`, name: `Gênesis`, ch: 50, day: 4 },
+      { id: `ex`, name: `Êxodo`, ch: 40, day: 4 },
+      { id: `lv`, name: `Levítico`, ch: 27, day: 4 },
+      { id: `nm`, name: `Números`, ch: 36, day: 4 },
+      { id: `dt`, name: `Deuteronômio`, ch: 34, day: 4 },
+      // Sexta: Evangelhos (5)
+      { id: `mt`, name: `Mateus`, ch: 28, day: 5 },
+      { id: `mc`, name: `Marcos`, ch: 16, day: 5 },
+      { id: `lc`, name: `Lucas`, ch: 24, day: 5 },
+      { id: `jo`, name: `João`, ch: 21, day: 5 },
+      // Sabado: Historia de Israel (6)
+      { id: `js`, name: `Josué`, ch: 24, day: 6 },
+      { id: `jz`, name: `Juízes`, ch: 21, day: 6 },
+      { id: `rt`, name: `Rute`, ch: 4, day: 6 },
+      { id: `1sm`, name: `1 Samuel`, ch: 31, day: 6 },
+      { id: `2sm`, name: `2 Samuel`, ch: 24, day: 6 },
+      { id: `1rs`, name: `1 Reis`, ch: 22, day: 6 },
+      { id: `2rs`, name: `2 Reis`, ch: 25, day: 6 },
+      { id: `1cr`, name: `1 Crônicas`, ch: 29, day: 6 },
+      { id: `2cr`, name: `2 Crônicas`, ch: 36, day: 6 },
+      { id: `ed`, name: `Esdras`, ch: 10, day: 6 },
+      { id: `ne`, name: `Neemias`, ch: 13, day: 6 },
+      { id: `et`, name: `Ester`, ch: 10, day: 6 },
+      // Segunda: Atos, Epistolas e Apocalipse (1)
+      { id: `at`, name: `Atos`, ch: 28, day: 1 },
+      { id: `rm`, name: `Romanos`, ch: 16, day: 1 },
+      { id: `1co`, name: `1 Coríntios`, ch: 16, day: 1 },
+      { id: `2co`, name: `2 Coríntios`, ch: 13, day: 1 },
+      { id: `gl`, name: `Gálatas`, ch: 6, day: 1 },
+      { id: `ef`, name: `Efésios`, ch: 6, day: 1 },
+      { id: `fp`, name: `Filipenses`, ch: 4, day: 1 },
+      { id: `cl`, name: `Colossenses`, ch: 4, day: 1 },
+      { id: `1ts`, name: `1 Tessalonicenses`, ch: 5, day: 1 },
+      { id: `2ts`, name: `2 Tessalonicenses`, ch: 3, day: 1 },
+      { id: `1tm`, name: `1 Timóteo`, ch: 6, day: 1 },
+      { id: `2tm`, name: `2 Timóteo`, ch: 4, day: 1 },
+      { id: `tt`, name: `Tito`, ch: 3, day: 1 },
+      { id: `fm`, name: `Filemom`, ch: 1, day: 1 },
+      { id: `hb`, name: `Hebreus`, ch: 13, day: 1 },
+      { id: `tg`, name: `Tiago`, ch: 5, day: 1 },
+      { id: `1pe`, name: `1 Pedro`, ch: 5, day: 1 },
+      { id: `2pe`, name: `2 Pedro`, ch: 3, day: 1 },
+      { id: `1jo`, name: `1 João`, ch: 5, day: 1 },
+      { id: `2jo`, name: `2 João`, ch: 1, day: 1 },
+      { id: `3jo`, name: `3 João`, ch: 1, day: 1 },
+      { id: `jd`, name: `Judas`, ch: 1, day: 1 },
+      { id: `ap`, name: `Apocalipse`, ch: 22, day: 1 },
+      // Terca: Profetas (2)
+      { id: `is`, name: `Isaías`, ch: 66, day: 2 },
+      { id: `jr`, name: `Jeremias`, ch: 52, day: 2 },
+      { id: `lm`, name: `Lamentações`, ch: 5, day: 2 },
+      { id: `ez`, name: `Ezequiel`, ch: 48, day: 2 },
+      { id: `dn`, name: `Daniel`, ch: 12, day: 2 },
+      { id: `os`, name: `Oseias`, ch: 14, day: 2 },
+      { id: `jl`, name: `Joel`, ch: 3, day: 2 },
+      { id: `am`, name: `Amós`, ch: 9, day: 2 },
+      { id: `ob`, name: `Obadias`, ch: 1, day: 2 },
+      { id: `jn`, name: `Jonas`, ch: 4, day: 2 },
+      { id: `mq`, name: `Miqueias`, ch: 7, day: 2 },
+      { id: `na`, name: `Naum`, ch: 3, day: 2 },
+      { id: `hc`, name: `Habacuque`, ch: 3, day: 2 },
+      { id: `sf`, name: `Sofonias`, ch: 3, day: 2 },
+      { id: `ag`, name: `Ageu`, ch: 2, day: 2 },
+      { id: `zc`, name: `Zacarias`, ch: 14, day: 2 },
+      { id: `ml`, name: `Malaquias`, ch: 4, day: 2 },
+      // Quarta: Sabedoria (3)
+      { id: `jb`, name: `Jó`, ch: 42, day: 3 },
+      { id: `pv`, name: `Provérbios`, ch: 31, day: 3 },
+      { id: `ec`, name: `Eclesiastes`, ch: 12, day: 3 },
+      { id: `ct`, name: `Cantares`, ch: 8, day: 3 }
+    ];
+
+    const BOOK_MAP = {};
+    BOOKS.forEach(function (b) { BOOK_MAP[b.id] = b; });
+
+    const DAY_INFO = {
+      4: { name: `Quinta-feira`, genre: `A Torá (Pentateuco)`, short: `Qui` },
+      5: { name: `Sexta-feira`, genre: `Os Evangelhos`, short: `Sex` },
+      6: { name: `Sábado`, genre: `História de Israel`, short: `Sáb` },
+      0: { name: `Domingo`, genre: `Dia do Senhor — Lecionário`, short: `Dom` },
+      1: { name: `Segunda-feira`, genre: `Atos, Epístolas e Apocalipse`, short: `Seg` },
+      2: { name: `Terça-feira`, genre: `Os Profetas`, short: `Ter` },
+      3: { name: `Quarta-feira`, genre: `Literatura Sapiencial`, short: `Qua` }
+    };
+
+    const LITURGY = {
+      gloriaPatri: `Glória ao Pai e ao Filho e ao Espírito Santo; como era no princípio, é agora e será sempre, por todos os séculos. Amém.`,
+      rubric: `Momento opcional: silêncio meditativo diante da Palavra, hino ou cântico de louvor, recitação do Credo Apostólico ou orações espontâneas do coração e intercessão.`,
+      lordsPrayer: `Pai nosso, que estás nos céus. Santificado seja o teu Nome. Venha o teu Reino. Seja feita a tua vontade, assim na terra como no céu. O pão nosso de cada dia nos dá hoje. Perdoa-nos as nossas dívidas, assim como nós perdoamos aos nossos devedores. E não nos deixes cair em tentação, mas livra-nos do mal; pois teu é o Reino, o poder e a glória para sempre. Amém.`,
+      collectMorning: `Senhor Deus, Todo-poderoso e eterno Pai, nos fizeste chegar são e salvos até este novo dia; conserva-nos com teu grande poder, para que não caiamos em pecado, nem nos vença a adversidade; e, em tudo o que faremos, dirige-nos a realizar teus desígnios; por Jesus Cristo, nosso Senhor. Amém.`,
+      collectEvening: `Fica conosco Senhor Jesus, agora que a noite se aproxima. Sê nosso companheiro no caminho, acende nossos corações e desperta a esperança, para que te conheçamos tal como te revelas nas Escrituras e no partir do pão. Concede isto por amor de teu nome. Amém.`
+    };
+
+    // =========================================================================
+    // 2. PLANO BIENAL COMPLETO DO KALENDAR (ANO I + ANO II)
+    // Formato compacto por dia da semana: [referencia, salmo]
+    // Para Domingo: [titulo, at, ep, sl, ev]
+    // =========================================================================
+    const PLAN_RAW = {
+      4: [
+        [`gn 1:1—2:3`, `Salmo 8:1–9`], [`gn 2:4—4:26`, `Salmo 51:1–9`], [`gn 5:1—6:8`, `Salmo 14:1–7`],
+        [`gn 6:9—9:29`, `Salmo 29:1–11`], [`gn 10:1—11:26`, `Salmo 2:1–12`], [`gn 11:27—12:20`, `Salmo 105:16–30`],
+        [`gn 13:1—14:24`, `Salmo 10:1–18`], [`gn 15:1—16:16`, `Salmo 89:19–37`], [`gn 17:1–27`, `Salmo 105:31–45`],
+        [`gn 18:1—19:38`, `Salmo 11:1–7`], [`gn 20:1—21:34`, `Salmo 13:1–6`], [`gn 22:1—23:20`, `Salmo 40:1–10`],
+        [`gn 24:1—25:18`, `Salmo 45:1–9`], [`gn 25:19—26:35`, `Salmo 105:1–11`], [`gn 27:1—28:22`, `Salmo 121:1–8`],
+        [`gn 29:1—31:55`, `Salmo 124:1–8`], [`gn 32:1—33:20`, `Salmo 125:1–5`], [`gn 34:1—36:43`, `Salmo 42:1–11`],
+        [`gn 37:1—38:30`, `Salmo 69:1–18`], [`gn 39:1—40:23`, `Salmo 105:16–22`], [`gn 41:1–57`, `Salmo 113:1–9`],
+        [`gn 42:1—44:34`, `Salmo 105:23–36`], [`gn 45:1—46:27`, `Salmo 105:37–45`], [`gn 46:28—48:22`, `Salmo 128:1–6`],
+        [`gn 49:1–33`, `Salmo 49:1–20`], [`gn 50:1–26`, `Salmo 37:1–11`], [`ex 1:1—2:25`, `Salmo 12:1–8`],
+        [`ex 3:1—4:31`, `Salmo 99:1–9`], [`ex 5:1—6:27`, `Salmo 135:1–14`], [`ex 6:28—8:32`, `Salmo 105:26–38`],
+        [`ex 9:1—10:29`, `Salmo 78:40–55`], [`ex 11:1—12:30`, `Salmo 114:1–8`], [`ex 12:31—13:22`, `Salmo 78:17–31`],
+        [`ex 14:1—15:21`, `Salmo 136:1–26`], [`ex 15:22—17:7`, `Salmo 78:32–50`], [`ex 17:8—18:27`, `Salmo 121:1–8`],
+        [`ex 19:1—20:26`, `Salmo 19:7–14`], [`ex 21:1—22:31`, `Salmo 82:1–8`], [`ex 23:1—24:18`, `Salmo 24:1–10`],
+        [`ex 25:1—26:37`, `Salmo 84:1–12`], [`ex 27:1—28:43`, `Salmo 132:1–18`], [`ex 29:1—30:38`, `Salmo 141:1–10`],
+        [`ex 31:1—32:35`, `Salmo 106:13–27`], [`ex 33:1—34:35`, `Salmo 99:1–9`], [`ex 35:1—36:38`, `Salmo 100:1–5`],
+        [`ex 37:1—38:31`, `Salmo 132:1–18`], [`ex 39:1—43`, `Salmo 133:1–3`], [`ex 40:1–38`, `Salmo 29:1–11`],
+        [`dt 1:1—2:23`, `Salmo 90:1–17`], [`dt 2:24—3:29`, `Salmo 44:1–8`], [`dt 4:1–49`, `Salmo 19:7–14`],
+        [`dt 5:1—6:25`, `Salmo 119:169–176`],
+        // Ano II - Quinta
+        [`lv 1:1—3:17`, `Salmo 40:1–10`], [`lv 4:1—6:7`, `Salmo 51:1–9`], [`lv 6:8—7:38`, `Salmo 50:1–15`],
+        [`lv 8:1—10:20`, `Salmo 99:1–9`], [`lv 11:1—12:8`, `Salmo 19:7–14`], [`lv 13:1—14:57`, `Salmo 103:1–11`],
+        [`lv 15:1—16:34`, `Salmo 38:1–22`], [`lv 17:1—18:30`, `Salmo 16:1–11`], [`lv 19:1—20:27`, `Salmo 15:1–5`],
+        [`lv 21:1—22:33`, `Salmo 24:1–10`], [`lv 23:1—24:23`, `Salmo 25:1–10`], [`lv 25:1–55`, `Salmo 85:8–13`],
+        [`lv 26:1–46`, `Salmo 1:1–6`], [`lv 27:1–34`, `Salmo 6:1–10`], [`nm 1:1—2:34`, `Salmo 120:1–7`],
+        [`nm 3:1—4:49`, `Salmo 134:1–3`], [`nm 5:1—6:27`, `Salmo 67:1–7`], [`nm 7:1–89`, `Salmo 131:1–3`],
+        [`nm 8:1—10:36`, `Salmo 81:1–16`], [`nm 11:1—12:16`, `Salmo 78:17–31`], [`nm 13:1—14:45`, `Salmo 95:1–11`],
+        [`nm 15:1—16:50`, `Salmo 106:13–27`], [`nm 17:1—19:22`, `Salmo 110:1–7`], [`nm 20:1—21:35`, `Salmo 114:1–8`],
+        [`nm 22:1—24:25`, `Salmo 23:1–6`], [`nm 25:1—26:65`, `Salmo 106:28–31`], [`nm 27:1—28:31`, `Salmo 104:24–35`],
+        [`nm 29:1—30:16`, `Salmo 81:1–16`], [`nm 31:1—32:42`, `Salmo 44:1–8`], [`nm 33:1–56`, `Salmo 77:1–20`],
+        [`nm 34:1—35:34`, `Salmo 91:1–16`], [`nm 36:1–13`, `Salmo 16:1–11`], [`dt 7:1—8:20`, `Salmo 105:1–15`],
+        [`dt 9:1—10:22`, `Salmo 106:19–27`], [`dt 11:1—12:32`, `Salmo 132:1–18`], [`dt 13:1—14:29`, `Salmo 119:129–144`],
+        [`dt 15:1—16:22`, `Salmo 82:1–8`], [`dt 17:1—18:22`, `Salmo 119:161–168`], [`dt 19:1—20:20`, `Salmo 46:1–11`],
+        [`dt 21:1—22:30`, `Salmo 51:1–19`], [`dt 23:1—24:22`, `Salmo 146:1–10`], [`dt 25:1—26:19`, `Salmo 105:1–15`],
+        [`dt 27:1—28:35`, `Salmo 1:1–6`], [`dt 28:36–68`, `Salmo 137:1–9`], [`dt 29:1—30:20`, `Salmo 19:7–14`],
+        [`dt 31:1–30`, `Salmo 31:1–8`], [`dt 32:1–52`, `Salmo 18:1–19`], [`dt 33:1–29`, `Salmo 144:1–15`],
+        [`dt 34:1–12`, `Salmo 90:1–17`], [`lv 19:1–18; 26:1–13`, `Salmo 15:1–5`], [`dt 6:4–25; 10:12–22`, `Salmo 119:169–176`],
+        [`dt 30:11–20; 34:1–12`, `Salmo 90:1–17`]
+      ],
+      5: [
+        [`mc 1:1–20`, `Salmo 27:1–6`], [`mc 1:21–45`, `Salmo 103:1–11`], [`mc 2:1—3:6`, `Salmo 130:1–8`],
+        [`mc 3:7–35`, `Salmo 15:1–5`], [`mc 4:1–41`, `Salmo 107:23–32`], [`mc 5:1–43`, `Salmo 116:1–9`],
+        [`mc 6:1–29`, `Salmo 116:10–19`], [`mc 6:30–56`, `Salmo 77:11–20`], [`mc 7:1–37`, `Salmo 51:10–19`],
+        [`mc 8:1–38`, `Salmo 34:11–22`], [`mc 9:1–50`, `Salmo 99:1–9`], [`mc 10:1–52`, `Salmo 130:1–8`],
+        [`mc 11:1–33`, `Salmo 118:19–29`], [`mc 12:1–44`, `Salmo 118:1–9`], [`mc 13:1–37`, `Salmo 46:1–11`],
+        [`mc 14:1–31`, `Salmo 116:12–19`], [`mc 14:32–72`, `Salmo 88:1–18`], [`mc 15:1–47`, `Salmo 22:19–31`],
+        [`mc 16:1–20`, `Salmo 16:1–11`], [`mt 1:1–25`, `Salmo 127:1–5`], [`mt 2:1–23`, `Salmo 72:11–20`],
+        [`mt 3:1—4:25`, `Salmo 2:1–12`], [`mt 5:1–26`, `Salmo 1:1–6`], [`mt 5:27–48`, `Salmo 15:1–5`],
+        [`mt 6:1–34`, `Salmo 147:1–11`], [`mt 7:1–29`, `Salmo 119:113–128`], [`mt 8:1–34`, `Salmo 107:1–16`],
+        [`mt 9:1–38`, `Salmo 103:1–11`], [`mt 10:1–42`, `Salmo 91:1–16`], [`mt 11:1–30`, `Salmo 116:1–9`],
+        [`mt 12:1–50`, `Salmo 92:1–15`], [`mt 13:1–58`, `Salmo 78:1–16`], [`mt 14:1–36`, `Salmo 145:14–21`],
+        [`mt 15:1–39`, `Salmo 86:1–17`], [`mt 16:1–28`, `Salmo 16:1–11`], [`mt 17:1–27`, `Salmo 97:1–12`],
+        [`mt 18:1–35`, `Salmo 103:8–18`], [`mt 19:1–30`, `Salmo 131:1–3`], [`mt 20:1–34`, `Salmo 146:1–10`],
+        [`mt 21:1–46`, `Salmo 118:19–29`], [`mt 22:1–46`, `Salmo 35:1–14`], [`mt 23:1–39`, `Salmo 50:1–15`],
+        [`mt 24:1–51`, `Salmo 46:1–11`], [`mt 25:1–46`, `Salmo 27:1–14`], [`mt 26:1–35`, `Salmo 23:1–6`],
+        [`mt 26:36–75`, `Salmo 109:1–31`], [`mt 27:1–31`, `Salmo 22:1–18`], [`mt 27:32–66`, `Salmo 22:19–31`],
+        [`mt 28:1–20`, `Salmo 96:1–13`], [`mt 5:1—7:29`, `Salmo 1:1–6`], [`mc 8:27—10:45`, `Salmo 22:19–31`],
+        [`mt 28:1–20`, `Salmo 98:1–9`],
+        // Ano II - Sexta
+        [`lc 1:1–38`, `Salmo 10:1–18`], [`lc 1:39–80`, `Salmo 13:1–6`], [`lc 2:1–52`, `Salmo 8:1–9`],
+        [`lc 3:1—4:13`, `Salmo 80:1–7`], [`lc 4:14–44`, `Salmo 91:1–16`], [`lc 5:1—6:11`, `Salmo 32:1–11`],
+        [`lc 6:12–49`, `Salmo 1:1–6`], [`lc 7:1–50`, `Salmo 116:1–9`], [`lc 8:1–56`, `Salmo 107:23–32`],
+        [`lc 9:1–50`, `Salmo 113:1–9`], [`lc 9:51—11:13`, `Salmo 91:1–16`], [`lc 11:14–54`, `Salmo 103:1–11`],
+        [`lc 12:1—13:9`, `Salmo 37:1–11`], [`lc 13:10–35`, `Salmo 51:1–19`], [`lc 14:1—15:32`, `Salmo 103:8–18`],
+        [`lc 16:1—17:10`, `Salmo 49:1–20`], [`lc 17:11—18:30`, `Salmo 130:1–8`], [`lc 18:31—19:44`, `Salmo 118:19–29`],
+        [`lc 19:45—21:38`, `Salmo 35:1–14`], [`lc 22:1–71`, `Salmo 55:1–23`], [`lc 23:1–56`, `Salmo 69:1–36`],
+        [`lc 24:1–35`, `Salmo 118:15–29`], [`lc 24:36–53`, `Salmo 47:1–9`], [`jo 1:1–34`, `Salmo 33:1–11`],
+        [`jo 1:35–51`, `Salmo 34:1–10`], [`jo 2:1–25`, `Salmo 104:11–23`], [`jo 3:1–36`, `Salmo 103:1–14`],
+        [`jo 4:1–30`, `Salmo 42:1–11`], [`jo 4:31–54`, `Salmo 30:1–12`], [`jo 5:1–24`, `Salmo 107:17–22`],
+        [`jo 5:25–47`, `Salmo 112:1–10`], [`jo 6:1–40`, `Salmo 78:17–31`], [`jo 6:41–71`, `Salmo 119:81–96`],
+        [`jo 7:1–52`, `Salmo 104:10–18`], [`jo 7:53—8:30`, `Salmo 27:1–6`], [`jo 8:31–59`, `Salmo 12:1–8`],
+        [`jo 9:1–41`, `Salmo 146:1–10`], [`jo 10:1–21`, `Salmo 23:1–6`], [`jo 10:22–42`, `Salmo 7:1–17`],
+        [`jo 11:1–37`, `Salmo 16:1–11`], [`jo 11:38–57`, `Salmo 64:1–10`], [`jo 12:1–50`, `Salmo 118:19–29`],
+        [`jo 13:1–38`, `Salmo 41:1–13`], [`jo 14:1–31`, `Salmo 27:1–14`], [`jo 15:1–27`, `Salmo 35:15–28`],
+        [`jo 16:1–33`, `Salmo 16:1–11`], [`jo 17:1–26`, `Salmo 110:1–7`], [`jo 18:1–40`, `Salmo 109:1–31`],
+        [`jo 19:1–42`, `Salmo 88:1–18`], [`jo 20:1–31`, `Salmo 16:1–11`], [`jo 21:1–25`, `Salmo 23:1–6`],
+        [`jo 1:1–18; 20:19–31`, `Salmo 98:1–9`]
+      ],
+      6: [
+        [`js 1:1—2:24`, `Salmo 24:1–10`], [`js 3:1—5:12`, `Salmo 114:1–8`], [`js 5:13—8:35`, `Salmo 44:1–8`],
+        [`js 9:1—10:43`, `Salmo 18:1–19`], [`js 11:1—12:24`, `Salmo 9:1–20`], [`js 13:1—15:63`, `Salmo 16:1–11`],
+        [`js 16:1—19:51`, `Salmo 132:1–10`], [`js 20:1—21:45`, `Salmo 7:1–17`], [`js 22:1–34`, `Salmo 133:1–3`],
+        [`js 23:1—24:33`, `Salmo 119:25–32`], [`jz 1:1—3:31`, `Salmo 106:32–48`], [`jz 4:1—5:31`, `Salmo 21:1–13`],
+        [`jz 6:1—8:35`, `Salmo 83:1–18`], [`jz 9:1—10:5`, `Salmo 6:1–10`], [`jz 10:6—12:15`, `Salmo 120:1–7`],
+        [`jz 13:1—16:31`, `Salmo 129:1–8`], [`jz 17:1—18:31`, `Salmo 115:1–18`], [`jz 19:1—21:25`, `Salmo 43:1–5`],
+        [`rt 1:1—2:23`, `Salmo 31:1–8`], [`rt 3:1—4:22`, `Salmo 16:1–11`], [`1sm 1:1—3:21`, `Salmo 115:1–18`],
+        [`1sm 4:1—7:17`, `Salmo 78:56–72`], [`1sm 8:1—10:27`, `Salmo 89:38–52`], [`1sm 11:1—13:23`, `Salmo 20:1–9`],
+        [`1sm 14:1–52`, `Salmo 144:1–15`], [`1sm 15:1—16:23`, `Salmo 51:1–19`], [`1sm 17:1–58`, `Salmo 144:1–15`],
+        [`1sm 18:1—20:43`, `Salmo 59:1–17`], [`1sm 21:1—23:29`, `Salmo 52:1–9`], [`1sm 24:1—26:25`, `Salmo 54:1–7`],
+        [`1sm 27:1—29:11`, `Salmo 57:1–11`], [`1sm 30:1—31:13`, `Salmo 18:35–50`], [`2sm 1:1—3:39`, `Salmo 56:1–13`],
+        [`2sm 4:1—6:23`, `Salmo 24:1–10`], [`2sm 7:1—9:13`, `Salmo 89:1–18`], [`2sm 10:1—12:31`, `Salmo 51:1–19`],
+        [`2sm 13:1—14:33`, `Salmo 55:1–15`], [`2sm 15:1—17:29`, `Salmo 3:1–8`], [`2sm 18:1—19:43`, `Salmo 4:1–8`],
+        [`2sm 20:1—21:22`, `Salmo 144:1–15`], [`2sm 22:1–51`, `Salmo 18:20–34`], [`2sm 23:1—24:25`, `Salmo 30:1–12`],
+        [`1rs 1:1—2:46`, `Salmo 101:1–8`], [`1rs 3:1—4:34`, `Salmo 119:97–104`], [`1rs 5:1—7:51`, `Salmo 87:1–7`],
+        [`1rs 8:1–66`, `Salmo 132:1–10`], [`1rs 9:1—11:43`, `Salmo 72:11–20`], [`1rs 12:1—14:31`, `Salmo 12:1–8`],
+        [`1rs 15:1—16:34`, `Salmo 82:1–8`], [`1rs 17:1—19:21`, `Salmo 27:1–6`], [`1rs 20:1—21:29`, `Salmo 5:1–12`],
+        [`1rs 22:1–54`, `Salmo 97:1–12`],
+        // Ano II - Sabado
+        [`2rs 1:1—2:25`, `Salmo 68:1–18`], [`2rs 3:1—5:27`, `Salmo 107:31–43`], [`2rs 6:1—8:29`, `Salmo 91:1–16`],
+        [`2rs 9:1—10:36`, `Salmo 5:1–12`], [`2rs 11:1—13:25`, `Salmo 20:1–9`], [`2rs 14:1—16:20`, `Salmo 78:56–72`],
+        [`2rs 17:1–41`, `Salmo 79:1–13`], [`2rs 18:1—19:37`, `Salmo 46:1–11`], [`2rs 20:1—22:20`, `Salmo 119:9–16`],
+        [`2rs 23:1—25:30`, `Salmo 74:1–12`], [`1cr 1:1—4:43`, `Salmo 105:1–15`], [`1cr 5:1—9:44`, `Salmo 132:1–10`],
+        [`1cr 10:1—12:40`, `Salmo 57:1–11`], [`1cr 13:1—16:43`, `Salmo 105:1–15`], [`1cr 17:1—19:19`, `Salmo 89:1–18`],
+        [`1cr 20:1—22:19`, `Salmo 127:1–5`], [`1cr 23:1—25:31`, `Salmo 135:1–21`], [`1cr 26:1—27:34`, `Salmo 84:1–12`],
+        [`1cr 28:1–21`, `Salmo 139:13–24`], [`1cr 29:1–30`, `Salmo 145:1–13`], [`2cr 1:1—3:17`, `Salmo 54:1–7`],
+        [`2cr 4:1—6:42`, `Salmo 132:1–18`], [`2cr 7:1—9:31`, `Salmo 99:1–9`], [`2cr 10:1—12:16`, `Salmo 3:1–8`],
+        [`2cr 13:1—16:14`, `Salmo 9:1–20`], [`2cr 17:1—20:37`, `Salmo 60:1–12`], [`2cr 21:1—24:27`, `Salmo 78:1–16`],
+        [`2cr 25:1—28:27`, `Salmo 76:1–12`], [`2cr 29:1—30:27`, `Salmo 100:1–5`], [`2cr 31:1—32:33`, `Salmo 121:1–8`],
+        [`2cr 33:1—34:33`, `Salmo 51:1–19`], [`2cr 35:1—36:23`, `Salmo 126:1–6`], [`ed 1:1—3:13`, `Salmo 118:19–29`],
+        [`ed 4:1—6:22`, `Salmo 138:1–8`], [`ed 7:1—8:36`, `Salmo 119:97–104`], [`ed 9:1—10:44`, `Salmo 102:1–28`],
+        [`ne 1:1—3:32`, `Salmo 122:1–9`], [`ne 4:1—6:19`, `Salmo 59:1–17`], [`ne 7:1—8:18`, `Salmo 19:7–14`],
+        [`ne 9:1—10:39`, `Salmo 143:1–12`], [`ne 11:1—12:47`, `Salmo 147:1–20`], [`ne 13:1–31`, `Salmo 92:1–15`],
+        [`et 1:1—2:23`, `Salmo 45:1–9`], [`et 3:1—4:17`, `Salmo 83:1–18`], [`et 5:1—7:10`, `Salmo 52:1–9`],
+        [`et 8:1—10:3`, `Salmo 124:1–8`], [`1cr 16:7–36`, `Salmo 66:1–20`], [`1cr 29:10–20`, `Salmo 71:1–24`],
+        [`ne 8:1–18`, `Salmo 19:7–14`], [`ne 9:1–38`, `Salmo 106:1–12`], [`2cr 6:14–42`, `Salmo 86:1–17`],
+        [`ed 3:10–13; ne 12:43`, `Salmo 136:1–26`]
+      ],
+      1: [
+        [`rm 1:1–17`, `Salmo 85:1–7`], [`rm 1:18—2:29`, `Salmo 50:1–6`], [`rm 3:1–31`, `Salmo 32:1–11`],
+        [`rm 4:1–25`, `Salmo 105:1–15`], [`rm 5:1–21`, `Salmo 85:8–13`], [`rm 6:1–23`, `Salmo 67:1–7`],
+        [`rm 7:1–25`, `Salmo 119:17–24`], [`rm 8:1–17`, `Salmo 103:12–22`], [`rm 8:18–39`, `Salmo 44:9–26`],
+        [`rm 9:1—10:21`, `Salmo 19:1–6`], [`rm 11:1–36`, `Salmo 139:1–12`], [`rm 12:1—13:14`, `Salmo 40:11–17`],
+        [`rm 14:1—15:13`, `Salmo 117:1–2`], [`rm 15:14—16:27`, `Salmo 18:35–50`], [`1co 1:1—3:4`, `Salmo 123:1–4`],
+        [`1co 3:5—4:21`, `Salmo 94:1–11`], [`1co 5:1—7:40`, `Salmo 134:1–3`], [`1co 8:1—11:1`, `Salmo 95:1–11`],
+        [`1co 11:2—12:31`, `Salmo 31:9–24`], [`1co 13:1—14:40`, `Salmo 118:1–14`], [`1co 15:1–34`, `Salmo 118:1–18`],
+        [`1co 15:35–58`, `Salmo 16:1–11`], [`1co 16:1–24`, `Salmo 133:1–3`], [`2co 1:1—3:18`, `Salmo 34:1–10`],
+        [`2co 4:1—7:16`, `Salmo 116:10–19`], [`2co 8:1—9:15`, `Salmo 112:1–10`], [`2co 10:1—11:33`, `Salmo 33:1–11`],
+        [`2co 12:1—13:13`, `Salmo 34:15–22`], [`gl 1:1—2:21`, `Salmo 143:1–12`], [`gl 3:1—4:20`, `Salmo 125:1–5`],
+        [`gl 4:21—5:26`, `Salmo 119:33–48`], [`gl 6:1–18`, `Salmo 133:1–3`], [`ef 1:1—2:22`, `Salmo 103:1–11`],
+        [`ef 3:1—4:32`, `Salmo 133:1–3`], [`ef 5:1—6:24`, `Salmo 144:1–15`], [`fp 1:1–30`, `Salmo 27:1–14`],
+        [`fp 2:1–30`, `Salmo 110:1–7`], [`fp 3:1—4:23`, `Salmo 16:5–11`], [`cl 1:1–29`, `Salmo 89:1–18`],
+        [`cl 2:1—3:17`, `Salmo 93:1–5`], [`cl 3:18—4:18`, `Salmo 128:1–6`], [`fm 1–25`, `Salmo 133:1–3`],
+        [`1ts 1:1—3:13`, `Salmo 112:1–10`], [`1ts 4:1—5:28`, `Salmo 96:1–13`], [`2ts 1:1—3:18`, `Salmo 97:1–12`],
+        [`1tm 1:1—3:16`, `Salmo 15:1–5`], [`1tm 4:1—6:21`, `Salmo 119:161–176`], [`2tm 1:1—2:26`, `Salmo 119:145–160`],
+        [`2tm 3:1—4:22`, `Salmo 16:1–11`], [`tt 1:1—3:15`, `Salmo 130:1–8`], [`rm 8:1–39`, `Salmo 103:19–22`],
+        [`1co 13:1—14:1`, `Salmo 149:1–9`],
+        // Ano II - Segunda
+        [`hb 1:1—2:18`, `Salmo 2:1–12`], [`hb 3:1—4:13`, `Salmo 95:1–11`], [`hb 4:14—6:20`, `Salmo 110:1–7`],
+        [`hb 7:1–28`, `Salmo 110:1–4`], [`hb 8:1—9:28`, `Salmo 89:1–18`], [`hb 10:1–39`, `Salmo 40:6–10`],
+        [`hb 11:1–40`, `Salmo 105:1–15`], [`hb 12:1–29`, `Salmo 118:1–18`], [`hb 13:1–25`, `Salmo 133:1–3`],
+        [`tg 1:1—2:26`, `Salmo 1:1–6`], [`tg 3:1—5:20`, `Salmo 141:1–10`], [`1pe 1:1—2:25`, `Salmo 34:11–22`],
+        [`1pe 3:1—5:14`, `Salmo 34:1–10`], [`2pe 1:1—3:18`, `Salmo 90:1–12`], [`1jo 1:1—3:10`, `Salmo 133:1–3`],
+        [`1jo 3:11—5:21`, `Salmo 118:1–14`], [`2jo 1–13; 3jo 1–15; jd 1–25`, `Salmo 119:1–16`],
+        [`at 1:1—2:47`, `Salmo 16:1–11`], [`at 3:1—5:42`, `Salmo 118:19–29`], [`at 6:1—8:40`, `Salmo 31:1–8`],
+        [`at 9:1—10:48`, `Salmo 18:1–19`], [`at 11:1—12:25`, `Salmo 34:1–10`], [`at 13:1—14:28`, `Salmo 96:1–13`],
+        [`at 15:1—16:40`, `Salmo 119:49–64`], [`at 17:1—18:22`, `Salmo 19:1–6`], [`at 18:23—20:38`, `Salmo 23:1–6`],
+        [`at 21:1—22:30`, `Salmo 27:1–14`], [`at 23:1—24:27`, `Salmo 56:1–13`], [`at 25:1—26:32`, `Salmo 119:41–48`],
+        [`at 27:1—44`, `Salmo 107:23–32`], [`at 28:1–31`, `Salmo 98:1–9`], [`ap 1:1–20`, `Salmo 110:1–7`],
+        [`ap 2:1—3:22`, `Salmo 15:1–5`], [`ap 4:1—5:14`, `Salmo 99:1–9`], [`ap 6:1—7:17`, `Salmo 96:1–13`],
+        [`ap 8:1—9:21`, `Salmo 141:1–4`], [`ap 10:1—11:19`, `Salmo 97:1–12`], [`ap 12:1—13:18`, `Salmo 118:1–14`],
+        [`ap 14:1—15:8`, `Salmo 145:1–13`], [`ap 16:1–21`, `Salmo 140:1–13`], [`ap 17:1—18:24`, `Salmo 75:1–10`],
+        [`ap 19:1–21`, `Salmo 45:1–17`], [`ap 20:1–15`, `Salmo 28:1–9`], [`ap 21:1–27`, `Salmo 87:1–7`],
+        [`ap 22:1–21`, `Salmo 46:1–11`], [`rm 8:18–39`, `Salmo 23:1–6`], [`ef 1:3–14; 2:1–10`, `Salmo 103:1–14`],
+        [`fp 2:5–11; cl 1:15–20`, `Salmo 110:1–7`], [`1co 15:50–58`, `Salmo 118:1–18`], [`hb 11:1—12:2`, `Salmo 105:1–15`],
+        [`ap 1:4–8`, `Salmo 93:1–5`], [`ap 21:1—22:5`, `Salmo 148:1–14`]
+      ],
+      2: [
+        [`is 1:1—2:5`, `Salmo 80:1–7`], [`is 2:6—5:30`, `Salmo 80:8–19`], [`is 6:1—8:22`, `Salmo 96:1–13`],
+        [`is 9:1—10:34`, `Salmo 89:1–18`], [`is 11:1—12:6`, `Salmo 72:1–10`], [`is 13:1—14:32`, `Salmo 76:1–12`],
+        [`is 15:1—19:25`, `Salmo 68:19–35`], [`is 20:1—23:18`, `Salmo 46:1–11`], [`is 24:1—27:13`, `Salmo 30:1–12`],
+        [`is 28:1—29:24`, `Salmo 118:19–29`], [`is 30:1—33:24`, `Salmo 62:1–12`], [`is 34:1—35:10`, `Salmo 65:1–13`],
+        [`is 36:1—39:8`, `Salmo 48:1–14`], [`is 40:1–31`, `Salmo 103:1–14`], [`is 41:1—42:25`, `Salmo 89:19–29`],
+        [`is 43:1—44:28`, `Salmo 122:1–9`], [`is 45:1—48:22`, `Salmo 98:1–9`], [`is 49:1—50:11`, `Salmo 22:1–18`],
+        [`is 51:1—52:12`, `Salmo 70:1–5`], [`is 52:13—53:12`, `Salmo 30:1–12`], [`is 54:1—55:13`, `Salmo 63:1–11`],
+        [`is 56:1—59:21`, `Salmo 58:1–11`], [`is 60:1—62:12`, `Salmo 108:1–13`], [`is 63:1—64:12`, `Salmo 79:1–13`],
+        [`is 65:1–25`, `Salmo 138:1–8`], [`is 66:1–24`, `Salmo 96:1–13`], [`jr 1:1—3:5`, `Salmo 142:1–7`],
+        [`jr 3:6—6:30`, `Salmo 81:1–16`], [`jr 7:1—10:25`, `Salmo 50:1–15`], [`jr 11:1—13:27`, `Salmo 64:1–10`],
+        [`jr 14:1—17:27`, `Salmo 1:1–6`], [`jr 18:1—20:18`, `Salmo 31:1–14`], [`jr 21:1—23:40`, `Salmo 72:1–10`],
+        [`jr 24:1—25:38`, `Salmo 75:1–10`], [`jr 26:1—29:32`, `Salmo 126:1–6`], [`jr 30:1—31:40`, `Salmo 103:1–18`],
+        [`jr 32:1—33:26`, `Salmo 147:1–11`], [`jr 34:1—36:32`, `Salmo 140:1–13`], [`jr 37:1—39:18`, `Salmo 60:1–12`],
+        [`jr 40:1—45:5`, `Salmo 79:1–13`], [`jr 46:1—49:39`, `Salmo 47:1–9`], [`jr 50:1—51:64`, `Salmo 137:1–9`],
+        [`jr 52:1–34`, `Salmo 79:1–13`], [`lm 1:1–22`, `Salmo 130:1–8`], [`lm 2:1–22`, `Salmo 74:12–23`],
+        [`lm 3:1–66`, `Salmo 103:1–14`], [`lm 4:1—5:22`, `Salmo 71:1–16`], [`is 9:1–7; 11:1–10`, `Salmo 89:1–18`],
+        [`is 40:1–11; 53:1–12`, `Salmo 69:19–36`], [`jr 31:31–37`, `Salmo 103:1–18`], [`is 60:1–3; 61:1–11`, `Salmo 72:1–19`],
+        [`is 65:17–25`, `Salmo 148:1–14`],
+        // Ano II - Terca
+        [`ez 1:1—3:27`, `Salmo 104:1–10`], [`ez 4:1—7:27`, `Salmo 79:1–13`], [`ez 8:1—11:25`, `Salmo 74:1–12`],
+        [`ez 12:1—15:8`, `Salmo 11:1–7`], [`ez 16:1–63`, `Salmo 106:1–15`], [`ez 17:1—19:14`, `Salmo 80:8–19`],
+        [`ez 20:1–49`, `Salmo 106:16–31`], [`ez 21:1—23:49`, `Salmo 21:1–13`], [`ez 24:1—25:17`, `Salmo 30:1–12`],
+        [`ez 26:1—28:26`, `Salmo 29:1–11`], [`ez 29:1—32:32`, `Salmo 76:1–12`], [`ez 33:1—34:31`, `Salmo 33:12–22`],
+        [`ez 35:1—36:38`, `Salmo 36:1–12`], [`ez 37:1–28`, `Salmo 104:24–35`], [`ez 38:1—39:29`, `Salmo 46:1–11`],
+        [`ez 40:1—42:20`, `Salmo 48:1–14`], [`ez 43:1—44:31`, `Salmo 24:1–10`], [`ez 45:1—46:24`, `Salmo 70:1–5`],
+        [`ez 47:1—48:35`, `Salmo 46:1–11`], [`dn 1:1—2:49`, `Salmo 2:1–12`], [`dn 3:1—4:37`, `Salmo 91:1–16`],
+        [`dn 5:1—6:28`, `Salmo 91:11–16`], [`dn 7:1—8:27`, `Salmo 2:1–12`], [`dn 9:1—10:21`, `Salmo 79:1–13`],
+        [`dn 11:1—12:13`, `Salmo 125:1–5`], [`os 1:1—3:5`, `Salmo 103:1–14`], [`os 4:1—7:16`, `Salmo 129:1–8`],
+        [`os 8:1—10:15`, `Salmo 53:1–6`], [`os 11:1—14:9`, `Salmo 103:1–14`], [`jl 1:1—3:21`, `Salmo 29:1–11`],
+        [`am 1:1—4:13`, `Salmo 94:1–23`], [`am 5:1—9:15`, `Salmo 89:30–37`], [`ob 1–21`, `Salmo 115:1–18`],
+        [`jn 1:1—4:11`, `Salmo 142:1–7`], [`mq 1:1—4:13`, `Salmo 58:1–11`], [`mq 5:1—7:20`, `Salmo 123:1–4`],
+        [`na 1:1—3:19`, `Salmo 76:1–12`], [`hc 1:1—3:19`, `Salmo 37:1–11`], [`sf 1:1—3:20`, `Salmo 149:1–9`],
+        [`ag 1:1—2:23`, `Salmo 126:1–6`], [`zc 1:1—4:14`, `Salmo 104:24–35`], [`zc 5:1—8:23`, `Salmo 87:1–7`],
+        [`zc 9:1—11:17`, `Salmo 24:1–10`], [`zc 12:1—14:21`, `Salmo 22:19–31`], [`ml 1:1—2:17`, `Salmo 117:1–2`],
+        [`ml 3:1—4:6`, `Salmo 98:1–9`], [`ez 36:24–38; 37:1–14`, `Salmo 108:1–13`], [`dn 7:13–14; 12:1–3`, `Salmo 72:1–19`],
+        [`jl 2:28–32`, `Salmo 29:1–11`], [`hc 3:1–19`, `Salmo 18:30–36`], [`zc 9:9–17`, `Salmo 24:1–10`],
+        [`ml 4:1–6`, `Salmo 96:1–13`]
+      ],
+      3: [
+        [`pv 1:1–33`, `Salmo 25:1–10`], [`pv 2:1—3:35`, `Salmo 1:1–6`], [`pv 4:1—5:23`, `Salmo 119:9–16`],
+        [`pv 6:1—7:27`, `Salmo 19:7–14`], [`pv 8:1–36`, `Salmo 104:24–35`], [`pv 9:1–18`, `Salmo 34:1–10`],
+        [`pv 10:1–32`, `Salmo 37:1–11`], [`pv 11:1–31`, `Salmo 36:1–12`], [`pv 12:1–28`, `Salmo 141:1–10`],
+        [`pv 13:1–25`, `Salmo 97:1–12`], [`pv 14:1–35`, `Salmo 128:1–6`], [`pv 15:1–33`, `Salmo 37:12–22`],
+        [`pv 16:1–33`, `Salmo 37:23–40`], [`pv 17:1–28`, `Salmo 66:1–12`], [`pv 18:1–24`, `Salmo 61:1–8`],
+        [`pv 19:1–29`, `Salmo 41:1–13`], [`pv 20:1–30`, `Salmo 119:105–112`], [`pv 21:1–31`, `Salmo 50:7–23`],
+        [`pv 22:1–29`, `Salmo 102:1–28`], [`pv 23:1–35`, `Salmo 118:15–29`], [`pv 24:1–34`, `Salmo 117:1–2`],
+        [`pv 25:1–28`, `Salmo 25:11–22`], [`pv 26:1–28`, `Salmo 26:1–12`], [`pv 27:1–27`, `Salmo 27:7–14`],
+        [`pv 28:1–28`, `Salmo 28:1–9`], [`pv 29:1–27`, `Salmo 29:1–11`], [`pv 30:1–33`, `Salmo 12:1–8`],
+        [`pv 31:1–31`, `Salmo 112:1–10`], [`jb 1:1—2:13`, `Salmo 34:1–10`], [`jb 3:1–26`, `Salmo 88:1–18`],
+        [`jb 4:1—5:27`, `Salmo 94:12–23`], [`jb 6:1—7:21`, `Salmo 6:1–10`], [`jb 8:1–22`, `Salmo 37:23–40`],
+        [`jb 9:1—10:22`, `Salmo 143:1–12`], [`jb 11:1–20`, `Salmo 119:65–80`], [`jb 12:1—14:22`, `Salmo 39:1–13`],
+        [`jb 15:1–35`, `Salmo 38:1–11`], [`jb 16:1—17:16`, `Salmo 88:1–18`], [`jb 18:1–21`, `Salmo 49:1–20`],
+        [`jb 19:1–29`, `Salmo 19:1–14`], [`jb 20:1–29`, `Salmo 73:1–14`], [`jb 21:1–34`, `Salmo 73:15–28`],
+        [`pv 1:1–19`, `Salmo 53:1–6`], [`pv 3:1–18`, `Salmo 37:1–11`], [`pv 8:1–21`, `Salmo 111:1–10`],
+        [`pv 8:22–36`, `Salmo 19:7–14`], [`pv 9:1–12`, `Salmo 34:1–10`], [`jb 1:1–22`, `Salmo 1:1–6`],
+        [`jb 19:23–27`, `Salmo 17:1–15`], [`pv 4:1–19`, `Salmo 119:33–40`], [`pv 16:1–9`, `Salmo 37:1–11`],
+        [`pv 30:1–9`, `Salmo 150:1–6`],
+        // Ano II - Quarta
+        [`jb 22:1–30`, `Salmo 139:1–12`], [`jb 23:1—24:25`, `Salmo 28:1–9`], [`jb 25:1—26:14`, `Salmo 104:24–35`],
+        [`jb 27:1–23`, `Salmo 43:1–5`], [`jb 28:1–28`, `Salmo 111:1–10`], [`jb 29:1—30:31`, `Salmo 27:1–6`],
+        [`jb 31:1–40`, `Salmo 15:1–5`], [`jb 32:1—33:33`, `Salmo 33:1–11`], [`jb 34:1–37`, `Salmo 4:1–8`],
+        [`jb 35:1—36:33`, `Salmo 17:1–15`], [`jb 37:1–24`, `Salmo 26:1–12`], [`jb 38:1–41`, `Salmo 8:1–9`],
+        [`jb 39:1–30`, `Salmo 104:11–23`], [`jb 40:1–24`, `Salmo 104:1–10`], [`jb 41:1–34`, `Salmo 104:24–30`],
+        [`jb 42:1–17`, `Salmo 126:1–6`], [`ec 1:1–18`, `Salmo 39:1–13`], [`ec 2:1–26`, `Salmo 62:1–12`],
+        [`ec 3:1–22`, `Salmo 90:1–12`], [`ec 4:1–16`, `Salmo 133:1–3`], [`ec 5:1–20`, `Salmo 119:1–8`],
+        [`ec 6:1–12`, `Salmo 14:1–7`], [`ec 7:1–29`, `Salmo 1:1–6`], [`ec 8:1–17`, `Salmo 37:1–11`],
+        [`ec 9:1–18`, `Salmo 128:1–6`], [`ec 10:1–20`, `Salmo 112:1–10`], [`ec 11:1–8`, `Salmo 65:1–13`],
+        [`ec 11:9—12:14`, `Salmo 90:1–17`], [`ct 1:1–17`, `Salmo 45:1–9`], [`ct 2:1–17`, `Salmo 45:10–17`],
+        [`ct 3:1–11`, `Salmo 63:1–8`], [`ct 4:1–16`, `Salmo 45:1–9`], [`ct 5:1—6:3`, `Salmo 73:23–28`],
+        [`ct 6:4—7:13`, `Salmo 19:1–6`], [`ct 8:1–14`, `Salmo 138:1–8`], [`jb 28:12–28`, `Salmo 111:1–10`],
+        [`jb 38:1–18`, `Salmo 8:1–9`], [`jb 42:1–6`, `Salmo 139:1–12`], [`ec 3:1–15`, `Salmo 90:1–17`],
+        [`ec 11:1–6`, `Salmo 126:5–6`], [`ec 12:1–14`, `Salmo 90:1–12`], [`ct 2:8–17`, `Salmo 45:10–17`],
+        [`ct 8:6–7`, `Salmo 63:1–8`], [`pv 31:10–31`, `Salmo 112:1–10`], [`jb 23:8–12`, `Salmo 61:1–8`],
+        [`ec 5:1–7`, `Salmo 119:105–112`], [`ec 7:1–14`, `Salmo 37:23–40`], [`ct 4:7–16`, `Salmo 45:1–17`],
+        [`pv 2:1–9`, `Salmo 119:9–16`], [`pv 14:1–14`, `Salmo 101:1–8`], [`pv 22:1–6`, `Salmo 37:1–11`],
+        [`ec 1:1–11; 12:13–14`, `Salmo 150:1–6`]
+      ],
+      0: [
+        // Ano I - Domingos (LOC 1962 Canada)
+        [`1º Domingo do Advento`, `Isaías 62:10–12`, `Romanos 13:8–14`, `Salmo 85:4–7`, `Mateus 21:1–13`],
+        [`2º Domingo do Advento`, `Isaías 55:6–11`, `Romanos 15:4–13`, `Salmo 50:1–6`, `Lucas 21:25–33`],
+        [`3º Domingo do Advento`, `Isaías 35`, `1 Coríntios 4:1–5`, `Salmo 80:1–3`, `Mateus 11:2–10`],
+        [`4º Domingo do Advento`, `Isaías 40:1–9`, `Filipenses 4:4–7`, `Salmo 145:18–22`, `João 1:19–29`],
+        [`1º Domingo após o Natal`, `Rute 4:13–17`, `Gálatas 4:1–7`, `Salmo 110:1–4`, `Mateus 1:18–25`],
+        [`Oitava do Natal (2º após o Natal)`, `Isaías 9:2–7`, `Efésios 2:11–18`, `Salmo 145:18–22`, `Lucas 2:15–21`],
+        [`Batismo do Senhor (1º após a Epifania)`, `Isaías 42:1–8`, `Gálatas 3:23–29`, `Salmo 98:8–10`, `Marcos 1:1–11`],
+        [`2º Domingo após a Epifania`, `Provérbios 1:1–9`, `Romanos 12:1–5`, `Salmo 84:1–4`, `Lucas 2:41–52`],
+        [`Septuagesima (3ª pré-Quaresma)`, `Deuteronômio 34:1–12`, `1 Coríntios 9:24–27`, `Salmo 119:25–32`, `Mateus 20:1–16`],
+        [`Sexagesima (2ª pré-Quaresma)`, `Êxodo 16:11–21`, `2 Coríntios 11:21–31`, `Salmo 17:6–9`, `Lucas 8:4–15`],
+        [`Quinquagesima (pré-Quaresma)`, `Êxodo 34:1–8`, `1 Coríntios 13:1–13`, `Salmo 31:19–22`, `Lucas 18:31–43`],
+        [`1º Domingo na Quaresma`, `Deuteronômio 8:1–10`, `2 Coríntios 6:1–10`, `Salmo 91:9–16`, `Mateus 4:1–11`],
+        [`2º Domingo na Quaresma`, `Josué 2:1–14`, `1 Tessalonicenses 4:1–7`, `Salmo 123`, `Mateus 15:21–28`],
+        [`3º Domingo na Quaresma`, `Deuteronômio 12:1–7`, `Efésios 5:1–14`, `Salmo 25:15–21`, `Lucas 11:14–26`],
+        [`4º Domingo na Quaresma`, `Deuteronômio 15:1–11`, `Gálatas 4:26—5:1`, `Salmo 125`, `João 6:5–14`],
+        [`5º Domingo na Quaresma (Paixão)`, `Números 21:4–9`, `Hebreus 9:11–15`, `Salmo 143:1–10`, `Mateus 20:20–28`],
+        [`Domingo de Ramos`, `Isaías 49:1–9`, `Filipenses 2:5–11`, `Salmo 22:12–20`, `Mateus 27:1–54`],
+        [`Ressurreição do Senhor (Páscoa)`, `Isaías 25:6–9`, `Colossenses 3:1–11`, `Salmo 118:22–25`, `João 20:1–10`],
+        [`1º Domingo após a Páscoa`, `Atos 2:41–47`, `1 João 5:4–12`, `Salmo 118:22–25`, `João 20:19–23`],
+        [`2º Domingo após a Páscoa`, `Atos 4:1–12`, `1 Pedro 2:19–25`, `Salmo 63:1–3`, `João 10:11–16`],
+        [`3º Domingo após a Páscoa`, `Atos 4:23–31`, `1 Pedro 2:11–17`, `Salmo 66:7–8`, `João 16:16–22`],
+        [`4º Domingo após a Páscoa`, `Atos 4:32–35`, `Tiago 1:17–21`, `Salmo 118:15–18`, `João 16:5–15`],
+        [`5º Domingo após a Páscoa`, `Atos 9:32–42`, `Tiago 1:22–27`, `Salmo 66:14–18`, `João 16:23–33`],
+        [`Domingo após a Ascensão`, `Isaías 32:14–17`, `1 Pedro 4:7–11`, `Salmo 47:5–10`, `João 15:26—16:4`],
+        [`Domingo de Pentecostes`, `Jeremias 31:31–34`, `Atos 2:1–11`, `Salmo 68:7–10`, `João 14:15–27`],
+        [`Domingo da Trindade`, `Isaías 57:15–21`, `Apocalipse 4:1–11`, `Salmo 136:1–3`, `João 3:1–15`],
+        [`1º Domingo após a Trindade`, `2 Samuel 9:1–11`, `1 João 4:7–21`, `Salmo 41:1–4`, `Lucas 16:19–31`],
+        [`2º Domingo após a Trindade`, `Daniel 9:15–19`, `1 João 3:13–24`, `Salmo 23:5–6`, `Lucas 14:15–24`],
+        [`3º Domingo após a Trindade`, `1 Samuel 17:32–50`, `1 Pedro 5:5–11`, `Salmo 7:10–12`, `Lucas 15:1–10`],
+        [`4º Domingo após a Trindade`, `Lamentações 3:22–32`, `Romanos 8:18–23`, `Salmo 9:9–12`, `Lucas 6:36–42`],
+        [`5º Domingo após a Trindade`, `Isaías 6:1–8`, `1 Pedro 3:8–15`, `Salmo 84:7–12`, `Lucas 5:1–11`],
+        [`6º Domingo após a Trindade`, `Jonas 2`, `Romanos 6:3–11`, `Salmo 90:13–17`, `Lucas 6:27–36`],
+        [`7º Domingo após a Trindade`, `Isaías 55:1–5`, `Romanos 6:17–23`, `Salmo 34:11–15`, `Marcos 8:1–10`],
+        [`8º Domingo após a Trindade`, `Deuteronômio 30:11–20`, `Romanos 8:12–17`, `Salmo 48:11–13`, `Mateus 7:15–21`],
+        [`9º Domingo após a Trindade`, `Provérbios 8:1–13`, `1 Coríntios 10:1–17`, `Salmo 105:39–43`, `Lucas 16:1–10`],
+        [`10º Domingo após a Trindade`, `1 Reis 8:22–30`, `1 Coríntios 12:1–11`, `Salmo 137`, `Lucas 19:41–47`],
+        [`11º Domingo após a Trindade`, `1 Crônicas 29:10–15`, `1 Coríntios 15:1–11`, `Salmo 51:16–18`, `Lucas 18:9–14`],
+        [`12º Domingo após a Trindade`, `Êxodo 4:10–12`, `2 Coríntios 3:4–9`, `Salmo 34:1–5`, `Marcos 7:31–37`],
+        [`13º Domingo após a Trindade`, `Gênesis 26:1–5`, `Gálatas 5:16–24`, `Salmo 90:13–17`, `Lucas 10:25–37`],
+        [`14º Domingo após a Trindade`, `2 Reis 5:9–19`, `Gálatas 5:25—6:5`, `Salmo 95:1–3`, `Lucas 17:11–19`],
+        [`15º Domingo após a Trindade`, `Josué 24:14–25`, `Gálatas 6:11–18`, `Salmo 92:1–4`, `Mateus 6:24–34`],
+        [`16º Domingo após a Trindade`, `Deuteronômio 7:6–9`, `Efésios 3:13–21`, `Salmo 146:7–9`, `Lucas 7:11–17`],
+        [`17º Domingo após a Trindade`, `Ezequiel 37:21–28`, `Efésios 4:1–6`, `Salmo 131`, `Lucas 14:1–11`],
+        [`18º Domingo após a Trindade`, `2 Samuel 7:8–14`, `1 Coríntios 1:4–8`, `Salmo 122:6–9`, `Marcos 12:28–37`],
+        [`19º Domingo após a Trindade`, `Provérbios 2:1–10, 20–22`, `Efésios 4:17–32`, `Salmo 103:1–5`, `Mateus 9:1–8`],
+        [`20º Domingo após a Trindade`, `Provérbios 1:20–33`, `Efésios 5:15–20`, `Salmo 145:14–17`, `Mateus 22:1–14`],
+        [`21º Domingo após a Trindade`, `Isaías 11:1–5`, `Efésios 6:10–20`, `Salmo 114:1–4`, `João 4:46–54`],
+        [`22º Domingo após a Trindade`, `Isaías 2:10–18`, `Filipenses 1:3–11`, `Salmo 133`, `Mateus 18:21–35`],
+        [`23º Domingo após a Trindade`, `Ageu 2:4–9`, `Filipenses 3:17–21`, `Salmo 24:7–10`, `Mateus 22:15–22`],
+        [`24º Domingo após a Trindade`, `Ezequiel 47:1–12`, `Colossenses 1:3–12`, `Salmo 147:13–16`, `Mateus 9:18–26`],
+        [`25º Domingo após a Trindade`, `Isaías 63:15–19`, `1 João 3:1–8`, `Salmo 99:6–9`, `Mateus 24:23–31`],
+        [`Domingo anterior ao Advento (Cristo Rei)`, `Jeremias 23:5–8`, `Colossenses 1:13–20`, `Salmo 85:8–13`, `João 1:35–45`],
+        // Ano II - Domingos (Year D Project)
+        [`1º Domingo do Advento (Ano II)`, `Malaquias 1:1–14`, `Hebreus 1:13—2:4`, `Salmo 18`, `Lucas 1:1–25`],
+        [`2º Domingo do Advento (Ano II)`, `Números 12:1–16`, `Hebreus 3:1–19`, `Salmo 106:7–18, 24–28`, `Lucas 1:58–67, 80`],
+        [`3º Domingo do Advento (Ano II)`, `Josué 23:1–16`, `Hebreus 4:1–11`, `Salmo 81:2–9`, `Lucas 3:23–38`],
+        [`4º Domingo do Advento (Ano II)`, `Números 14:1–25`, `Hebreus 5:11—6:20`, `Salmo 144`, `João 3:22–36`],
+        [`1º Domingo após o Natal (Ano II)`, `Gênesis 14:1–24`, `Hebreus 7:1–28`, `Salmo 110`, `Mateus 8:14–34`],
+        [`2º Domingo após o Natal (Ano II)`, `Êxodo 25:1–40`, `Hebreus 8:1–13`, `Salmo 73`, `Mateus 11:1, 12–15, 20–24`],
+        [`Batismo do Senhor (Ano II)`, `Levítico 16:1–34`, `Hebreus 9:1–28`, `Salmo 69`, `Mateus 14:1–12`],
+        [`2º Domingo após a Epifania (Ano II)`, `Isaías 26:7—27:1`, `Hebreus 10:1–4, 26–39`, `Salmo 109`, `Lucas 5:12–26`],
+        [`3º Domingo após a Epifania (Ano II)`, `Jó 32:1–22`, `Hebreus 11:4–7, 17–28`, `Salmo 89:5–18, 38–52`, `Lucas 5:27–39`],
+        [`4º Domingo após a Epifania (Ano II)`, `Jó 33:1–33`, `Hebreus 12:4–17`, `Salmo 34:11–18`, `Lucas 6:1–16`],
+        [`5º Domingo após a Epifania (Ano II)`, `Jó 34:1–20`, `Hebreus 13:9–14, 17–25`, `Salmo 28`, `Mateus 6:7–15`],
+        [`6º Domingo após a Epifania (Próprio 1)`, `Jó 34:21–37`, `2 Pedro 1:1–15`, `Salmo 12`, `Mateus 7:1–12`],
+        [`7º Domingo após a Epifania (Próprio 2)`, `Jó 35:1–16`, `2 Pedro 2:1–22`, `Salmo 119:17–32`, `Mateus 7:13–20`],
+        [`Transfiguração do Senhor`, `Jó 36:24—37:24`, `Judas 1–25`, `Salmo 11`, `Mateus 8:5–13`],
+        [`1º Domingo na Quaresma (Ano II)`, `Neemias 9:1–38`, `Gálatas 2:1–14`, `Salmo 6`, `João 7:1–13`],
+        [`2º Domingo na Quaresma (Ano II)`, `Ezequiel 47:1–12`, `Tiago 2:11–13, 18–26`, `Salmo 143`, `João 7:14–36`],
+        [`3º Domingo na Quaresma (Ano II)`, `Gênesis 13:1–18`, `Gálatas 3:1–22`, `Salmo 38`, `João 7:40–52`],
+        [`4º Domingo na Quaresma (Ano II)`, `Isaías 37:14–38`, `Tiago 4:4–6, 8b–17`, `Salmo 39`, `João 8:12–30`],
+        [`5º Domingo na Quaresma (Ano II)`, `Gênesis 4:1–16`, `Gálatas 5:2–12, 26`, `Salmo 101`, `João 8:31–47`],
+        [`Domingo de Ramos e da Paixão (Ano II)`, `Isaías 43:8–15`, `Romanos 1:8–15, 18–32; 2:1–11`, `Salmo 94`, `João 8:48–59`],
+        [`Ressurreição do Senhor (Ano II)`, `Deuteronômio 7:1–26`, `2 Coríntios 1:1–17`, `Salmo 75`, `João 5:19–30`],
+        [`2º Domingo da Páscoa (Ano II)`, `Oseias 14:1–9`, `2 Coríntios 1:23—2:17`, `Salmo 64`, `João 16:16–24`],
+        [`3º Domingo da Páscoa (Ano II)`, `Zacarias 13:1–9`, `2 Coríntios 6:11—7:1`, `Salmo 60`, `João 16:25–33`],
+        [`4º Domingo da Páscoa (Ano II)`, `Gênesis 38:1–30`, `2 Coríntios 7:2–16`, `Salmo 10`, `Mateus 22:23–33`],
+        [`5º Domingo da Páscoa (Ano II)`, `2 Reis 4:38–44`, `2 Coríntios 8:1–6, 16–24`, `Salmo 49:13–20`, `Mateus 15:29–39; 16:1–12`],
+        [`6º Domingo da Páscoa (Ano II)`, `Deuteronômio 19:15–21`, `2 Coríntios 9:1–15`, `Salmo 129`, `Mateus 18:1–14`],
+        [`7º Domingo da Páscoa (Ascensão)`, `Jeremias 9:23–24; 24:1–10`, `2 Coríntios 10:1–17`, `Salmo 115`, `Marcos 11:27–33; 12:35–37`],
+        [`Domingo de Pentecostes (Ano II)`, `Êxodo 4:1–17`, `2 Coríntios 11:1—12:1`, `Salmo 119:113–136`, `Lucas 12:1–12`],
+        [`Domingo da Santíssima Trindade (Ano II)`, `Eclesiastes 8:1–17`, `2 Coríntios 12:11–21; 13:1–10`, `Salmo 35`, `João 15:18–25; 16:1–4a`],
+        [`1º Domingo após a Trindade (Próprio 7)`, `Isaías 29:1–24`, `1 Timóteo 4:1–16`, `Salmo 55`, `Mateus 15:1–20`],
+        [`2º Domingo após a Trindade (Próprio 8)`, `2 Reis 20:1–21`, `2 João 1–13`, `Salmo 56`, `João 5:31–47`],
+        [`3º Domingo após a Trindade (Próprio 9)`, `2 Reis 6:8–23`, `1 Coríntios 5:1–6a, 9–13; 6:1–11`, `Salmo 57`, `Lucas 11:24–36`],
+        [`4º Domingo após a Trindade (Próprio 10)`, `Daniel 2:1–49`, `1 Coríntios 7:1–40`, `Salmo 17:8–14`, `Mateus 24:1–8`],
+        [`5º Domingo após a Trindade (Próprio 11)`, `Deuteronômio 31:23–29`, `1 Coríntios 9:1–15`, `Salmo 54`, `Mateus 10:17–22a; 24:9–14`],
+        [`6º Domingo após a Trindade (Próprio 12)`, `Zacarias 14:4–9`, `1 Coríntios 10:18—11:1`, `Salmo 50:9–21`, `Mateus 24:15–22`],
+        [`7º Domingo após a Trindade (Próprio 13)`, `Gênesis 19:1–29`, `1 João 2:3–29`, `Salmo 59`, `Lucas 17:20–37`],
+        [`8º Domingo após a Trindade (Próprio 14)`, `Zacarias 9:1–8, 11–17`, `1 Coríntios 11:2–22, 27–34`, `Salmo 37:12–38`, `Mateus 24:45–51`],
+        [`9º Domingo após a Trindade (Próprio 15)`, `Jeremias 22:1–9`, `1 Timóteo 3:1–16`, `Salmo 58`, `Mateus 23:13–39`],
+        [`10º Domingo após a Trindade (Próprio 16)`, `Habacuque 3:1–19`, `Colossenses 1:29—2:5, 20–23`, `Salmo 140`, `Mateus 21:12–22`],
+        [`11º Domingo após a Trindade (Próprio 17)`, `Isaías 45:14–25`, `1 Coríntios 14:1–40`, `Salmo 82`, `João 10:19–21, 31–42`],
+        [`12º Domingo após a Trindade (Próprio 18)`, `Êxodo 28:15–30`, `1 Coríntios 16:1–24`, `Salmo 141`, `João 11:46–57`],
+        [`13º Domingo após a Trindade (Próprio 19)`, `Deuteronômio 16:1–22`, `1 Timóteo 5:1–23`, `Salmo 92:5–11`, `Mateus 26:1–19`],
+        [`14º Domingo após a Trindade (Próprio 20)`, `Isaías 1:2–9`, `Tito 1:1–16`, `Salmo 25:11–22`, `João 13:18–20`],
+        [`15º Domingo após a Trindade (Próprio 21)`, `Ageu 1:1–15a`, `Efésios 5:21–33; 6:1–9, 21–24`, `Salmo 136`, `João 13:21–38`],
+        [`16º Domingo após a Trindade (Próprio 22)`, `2 Crônicas 7:1–22`, `Colossenses 3:18—4:18`, `Salmo 41`, `Lucas 22:14–38`],
+        [`17º Domingo após a Trindade (Próprio 23)`, `Ageu 2:10–19`, `Romanos 7:1–12`, `Salmos 3 e 134`, `Lucas 22:39–53`],
+        [`18º Domingo após a Trindade (Próprio 24)`, `Ageu 2:20–23`, `Romanos 9:6–33`, `Salmo 38`, `Lucas 22:54—23:1`],
+        [`19º Domingo após a Trindade (Próprio 25)`, `Naum 1:1–8`, `Romanos 11:2b–28, 33–36`, `Salmo 33:13–22`, `Lucas 23:2–25`],
+        [`20º Domingo após a Trindade (Próprio 26)`, `Naum 1:9–15`, `Romanos 15:1–3, 14–33`, `Salmo 40:12–17`, `Lucas 23:26–32`],
+        [`21º Domingo após a Trindade (Próprio 27)`, `Naum 2:1–13`, `Romanos 13:1–7; 14:13–23`, `Salmo 71:15–24`, `Lucas 23:33–49`],
+        [`22º Domingo após a Trindade (Próprio 28)`, `Naum 3:1–19`, `Romanos 16:1–25`, `Salmo 77:3–10`, `Lucas 23:50–56`],
+        [`Cristo Rei (Próprio 29)`, `Obadias 1–21`, `1 Coríntios 15:27–34, 39–41`, `Salmos 87 e 117`, `João 12:17–19, 37–50`]
+      ]
+    };
+
+    // =========================================================================
+    // 3. PARSING DE PERICOPES E CAPITULOS
+    // =========================================================================
+    function expandRef(compactRef) {
+      return compactRef.split(`;`).map(function (part) {
+        const trimmed = part.trim();
+        const m = trimmed.match(/^([0-9]?[a-z]+)\s+(.+)$/);
+        if (m && BOOK_MAP[m[1]]) {
+          return BOOK_MAP[m[1]].name + ` ` + m[2];
+        }
+        return trimmed;
+      }).join(`; `);
+    }
+
+    function parsePericopeChapters(compactRef) {
+      // Retorna lista de objetos { bookId, chapters: [int...] }
+      const segments = compactRef.split(`;`);
+      const result = [];
+      let lastBookId = null;
+      segments.forEach(function (seg) {
+        const s = seg.trim();
+        let bookId = null;
+        let rest = null;
+        const m = s.match(/^([0-9]?[a-z]+)\s+(.+)$/);
+        if (m && BOOK_MAP[m[1]]) {
+          bookId = m[1];
+          rest = m[2];
+          lastBookId = bookId;
+        } else if (lastBookId) {
+          bookId = lastBookId;
+          rest = s;
+        } else {
+          return;
+        }
+        const book = BOOK_MAP[bookId];
+
+        // Livros de 1 capitulo (fm, ob, jd, 2jo, 3jo)
+        if (book.ch === 1) {
+          result.push({ bookId: bookId, chapters: [1] });
+          return;
+        }
+
+        // Caso multi-capitulo com travessao: ex "1:1—2:3" ou "31:1—32:35" ou "8:27—10:45"
+        const crossMatch = rest.match(/^(\d+):[^—]+—(\d+):.+$/);
+        if (crossMatch) {
+          const startCh = parseInt(crossMatch[1], 10);
+          const endCh = parseInt(crossMatch[2], 10);
+          const chs = [];
+          for (let c = startCh; c <= endCh; c++) chs.push(c);
+          result.push({ bookId: bookId, chapters: chs });
+          return;
+        }
+
+        // Caso capitulo unico com versos: ex "1:1–20" ou "40:1–38"
+        const singleMatch = rest.match(/^(\d+)(?::.+)?$/);
+        if (singleMatch) {
+          result.push({ bookId: bookId, chapters: [parseInt(singleMatch[1], 10)] });
+        }
+      });
+      return result;
+    }
+
+    // Construcao da estrutura normalizada do plano
+    const PLAN = {};
+    const BOOK_TO_READING_IDS = {};
+    BOOKS.forEach(function (b) { BOOK_TO_READING_IDS[b.id] = []; });
+
+    [4, 5, 6, 0, 1, 2, 3].forEach(function (day) {
+      PLAN[day] = PLAN_RAW[day].map(function (entry, idx) {
+        const id = day + `-` + idx;
+        if (day === 0) {
+          return {
+            id: id,
+            day: 0,
+            index: idx,
+            isSunday: true,
+            title: entry[0],
+            at: entry[1],
+            ep: entry[2],
+            psalm: entry[3],
+            ev: entry[4],
+            label: entry[0],
+            parts: []
+          };
+        }
+        const compactRef = entry[0];
+        const parts = parsePericopeChapters(compactRef);
+        parts.forEach(function (p) {
+          if (BOOK_TO_READING_IDS[p.bookId] && BOOK_TO_READING_IDS[p.bookId].indexOf(id) === -1) {
+            BOOK_TO_READING_IDS[p.bookId].push(id);
+          }
+        });
+        return {
+          id: id,
+          day: day,
+          index: idx,
+          isSunday: false,
+          compactRef: compactRef,
+          label: expandRef(compactRef),
+          psalm: entry[1],
+          parts: parts
+        };
+      });
+    });
+
+    // =========================================================================
+    // 4. ESTADO DO APLICATIVO E PERSISTENCIA VIA notebookAppApi
+    // =========================================================================
+    let appState = {
+      completedReadings: [], // array de IDs ex: ["4-0", "5-0"]
+      readChapters: {},      // mapa bookId -> array de capitulos inteiros lidos ex: { gn: [1,2] }
+      selectedOfficeDay: null,
+      selectedPeriod: null
+    };
+
+    let activeTab = `office`;
+    let expandedBooks = {};
+
+    function isReadingCompleted(id) {
+      return appState.completedReadings.indexOf(id) !== -1;
+    }
+
+    function isChapterRead(bookId, ch) {
+      const list = appState.readChapters[bookId];
+      return Array.isArray(list) && list.indexOf(ch) !== -1;
+    }
+
+    // Regra especial:
+    // Pula pericope SOMENTE se TODOS os capitulos da pericope estiverem marcados como lidos.
+    // Se houver pelo menos um capitulo ainda nao lido, NAO deve ser pulada.
+    // Leituras de Domingo nunca sao afetadas por livros/capitulos marcados na configuracao.
+    function isReadingSkippedByConfig(reading) {
+      if (reading.isSunday || !reading.parts || reading.parts.length === 0) return false;
+      for (let i = 0; i < reading.parts.length; i++) {
+        const part = reading.parts[i];
+        for (let j = 0; j < part.chapters.length; j++) {
+          if (!isChapterRead(part.bookId, part.chapters[j])) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    function isReadingResolved(reading) {
+      return isReadingCompleted(reading.id) || isReadingSkippedByConfig(reading);
+    }
+
+    function getNextReadingForDay(day) {
+      const list = PLAN[day] || [];
+      for (let i = 0; i < list.length; i++) {
+        if (!isReadingResolved(list[i])) return list[i];
+      }
+      return null;
+    }
+
+    // Ao concluir todas as pericopes de um livro no plano, marca o livro automaticamente como lido na configuracao
+    function syncAutoCompletedBooks() {
+      BOOKS.forEach(function (book) {
+        const reqIds = BOOK_TO_READING_IDS[book.id] || [];
+        if (reqIds.length === 0) return;
+        const allDone = reqIds.every(function (id) {
+          return isReadingCompleted(id);
+        });
+        if (allDone) {
+          const allCh = [];
+          for (let c = 1; c <= book.ch; c++) allCh.push(c);
+          appState.readChapters[book.id] = allCh;
+        }
+      });
+    }
+
+    async function persistState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+          await window.notebookAppApi.setAppState(appState);
+        }
+      } catch (err) {
+        console.error(`Erro ao salvar estado:`, err);
+      }
+    }
+
+    function detectDefaults() {
+      const now = new Date();
+      const todayDay = now.getDay();
+      const hour = now.getHours();
+      if (appState.selectedOfficeDay === null || appState.selectedOfficeDay === undefined) {
+        appState.selectedOfficeDay = todayDay;
+      }
+      if (!appState.selectedPeriod) {
+        appState.selectedPeriod = hour < 12 ? `morning` : `evening`;
+      }
+    }
+
+    // =========================================================================
+    // 5. ACOES DO USUARIO (HOISTED FUNCTIONS PARA ONCLICK/ONCHANGE)
+    // =========================================================================
+    function switchTab(tabName) {
+      activeTab = tabName;
+      const tabs = [`office`, `plan`, `config`];
+      tabs.forEach(function (t) {
+        const btn = document.getElementById(`tab-btn-` + t);
+        const panel = document.getElementById(`panel-` + t);
+        if (btn) btn.classList.toggle(`is-active`, t === tabName);
+        if (panel) panel.classList.toggle(`is-active`, t === tabName);
+      });
+      if (tabName === `office`) renderOfficeTab();
+      if (tabName === `plan`) renderPlanTab();
+      if (tabName === `config`) renderConfigTab();
+    }
+
+    function onOfficeDayChange(val) {
+      appState.selectedOfficeDay = parseInt(val, 10);
+      const fb = document.getElementById(`office-feedback`);
+      if (fb) fb.classList.remove(`is-visible`);
+      renderMetrics();
+      renderOfficeTab();
+      persistState();
+    }
+
+    function setOfficePeriod(period) {
+      appState.selectedPeriod = period;
+      renderOfficeTab();
+      persistState();
+    }
+
+    async function markCurrentOfficeRead() {
+      const day = appState.selectedOfficeDay;
+      const current = getNextReadingForDay(day);
+      if (!current) return;
+      if (appState.completedReadings.indexOf(current.id) === -1) {
+        appState.completedReadings.push(current.id);
+      }
+      syncAutoCompletedBooks();
+      await persistState();
+      renderMetrics();
+      renderOfficeTab();
+      const fb = document.getElementById(`office-feedback`);
+      if (fb) {
+        fb.textContent = `Leitura "` + current.label + `" marcada como lida. O próximo ofício deste dia já está exibido acima.`;
+        fb.classList.add(`is-visible`);
+      }
+    }
+
+    async function toggleReadingInPlan(readingId) {
+      const idx = appState.completedReadings.indexOf(readingId);
+      if (idx === -1) {
+        appState.completedReadings.push(readingId);
+      } else {
+        appState.completedReadings.splice(idx, 1);
+      }
+      syncAutoCompletedBooks();
+      await persistState();
+      renderMetrics();
+      renderPlanTab();
+    }
+
+    function toggleBookExpand(bookId) {
+      expandedBooks[bookId] = !expandedBooks[bookId];
+      renderConfigTab();
+    }
+
+    async function toggleWholeBook(bookId, checked) {
+      const book = BOOK_MAP[bookId];
+      if (!book) return;
+      if (checked) {
+        const arr = [];
+        for (let c = 1; c <= book.ch; c++) arr.push(c);
+        appState.readChapters[bookId] = arr;
+      } else {
+        delete appState.readChapters[bookId];
+      }
+      await persistState();
+      renderMetrics();
+      renderConfigTab();
+    }
+
+    async function toggleChapter(bookId, ch) {
+      const list = Array.isArray(appState.readChapters[bookId]) ? appState.readChapters[bookId].slice() : [];
+      const idx = list.indexOf(ch);
+      if (idx === -1) {
+        list.push(ch);
+        list.sort(function (a, b) { return a - b; });
+      } else {
+        list.splice(idx, 1);
+      }
+      if (list.length === 0) {
+        delete appState.readChapters[bookId];
+      } else {
+        appState.readChapters[bookId] = list;
+      }
+      await persistState();
+      renderMetrics();
+      renderConfigTab();
+    }
+
+    function exportProgressBackup() {
+      const payload = JSON.stringify(appState, null, 2);
+      if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === `function`) {
+        window.notebookAppApi.triggerFileDownload({
+          content: payload,
+          contentType: `text/plain`,
+          encoding: `UTF-8`,
+          filename: `kalendar-progresso.json`
+        });
+      }
+      const fb = document.getElementById(`config-feedback`);
+      if (fb) {
+        fb.textContent = `Backup exportado como "kalendar-progresso.json".`;
+        fb.classList.add(`is-visible`);
+      }
+    }
+
+    async function resetAllProgress(btn) {
+      if (btn.dataset.armed !== `true`) {
+        btn.dataset.armed = `true`;
+        btn.textContent = `Clique novamente para confirmar`;
+        return;
+      }
+      btn.dataset.armed = `false`;
+      btn.textContent = `Zerar Todo o Progresso`;
+      appState.completedReadings = [];
+      appState.readChapters = {};
+      await persistState();
+      renderMetrics();
+      renderOfficeTab();
+      renderPlanTab();
+      renderConfigTab();
+      const fb = document.getElementById(`config-feedback`);
+      if (fb) {
+        fb.textContent = `Todo o progresso e marcações de capítulos foram zerados.`;
+        fb.classList.add(`is-visible`);
+      }
+    }
+
+    // =========================================================================
+    // 6. RENDERIZACAO DAS TELAS
+    // =========================================================================
+    function renderMetrics() {
+      let total = 0;
+      let resolved = 0;
+      [4, 5, 6, 0, 1, 2, 3].forEach(function (d) {
+        const list = PLAN[d] || [];
+        total += list.length;
+        list.forEach(function (r) {
+          if (isReadingResolved(r)) resolved++;
+        });
+      });
+
+      const pct = total > 0 ? Math.round((resolved / total) * 100) : 0;
+      const elReadings = document.getElementById(`metric-readings`);
+      const elPct = document.getElementById(`metric-readings-pct`);
+      if (elReadings) elReadings.textContent = resolved + ` / ` + total;
+      if (elPct) elPct.textContent = pct + `% do ciclo bienal`;
+
+      let completedBooks = 0;
+      BOOKS.forEach(function (b) {
+        const list = appState.readChapters[b.id] || [];
+        if (list.length >= b.ch) completedBooks++;
+      });
+      const elBooks = document.getElementById(`metric-books`);
+      if (elBooks) elBooks.textContent = completedBooks + ` / ` + BOOKS.length;
+
+      const day = appState.selectedOfficeDay;
+      const info = DAY_INFO[day] || DAY_INFO[4];
+      const elWeekday = document.getElementById(`metric-weekday`);
+      const elGenre = document.getElementById(`metric-genre`);
+      if (elWeekday) elWeekday.textContent = info.name;
+      if (elGenre) elGenre.textContent = info.genre;
+    }
+
+    function renderOfficeTab() {
+      const day = appState.selectedOfficeDay;
+      const info = DAY_INFO[day] || DAY_INFO[4];
+      const daySelect = document.getElementById(`office-day-select`);
+      if (daySelect) daySelect.value = String(day);
+
+      const period = appState.selectedPeriod || `morning`;
+      const btnMorning = document.getElementById(`btn-period-morning`);
+      const btnEvening = document.getElementById(`btn-period-evening`);
+      if (btnMorning) btnMorning.classList.toggle(`is-active`, period === `morning`);
+      if (btnEvening) btnEvening.classList.toggle(`is-active`, period === `evening`);
+
+      const container = document.getElementById(`office-content`);
+      if (!container) return;
+
+      const reading = getNextReadingForDay(day);
+      const list = PLAN[day] || [];
+      let doneCount = 0;
+      list.forEach(function (r) { if (isReadingResolved(r)) doneCount++; });
+
+      if (!reading) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p class="office-day-tag">` + info.name + ` · Ciclo Concluído</p>
+            <h2 class="office-title">Todas as leituras deste dia foram concluídas</h2>
+            <p class="office-meta">Você completou ou marcou como lidas todas as ` + list.length + ` perícopes de ` + info.name + ` (` + info.genre + `).</p>
+            <div style="margin-top: var(--space-md);">
+              <button type="button" class="btn btn-secondary" onclick="switchTab('plan')">Revisar no Plano Completo</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const collectText = period === `morning` ? LITURGY.collectMorning : LITURGY.collectEvening;
+      const collectTitle = period === `morning` ? `Coleta da Manhã (antes das 12h)` : `Coleta da Tarde (a partir das 12h)`;
+
+      let readingHtml = ``;
+      if (reading.isSunday) {
+        readingHtml = `
+          <div class="reading-callout">
+            <p class="reading-ref">` + reading.title + `</p>
+            <p class="reading-sub">Lecionário dominical independente da marcação de livros</p>
+            <div class="sunday-grid">
+              <div class="sunday-item">
+                <div class="sunday-item-label">Antigo Testamento</div>
+                <div class="sunday-item-ref">` + reading.at + `</div>
+              </div>
+              <div class="sunday-item">
+                <div class="sunday-item-label">Epístola</div>
+                <div class="sunday-item-ref">` + reading.ep + `</div>
+              </div>
+              <div class="sunday-item">
+                <div class="sunday-item-label">Evangelho</div>
+                <div class="sunday-item-ref">` + reading.ev + `</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        readingHtml = `
+          <div class="reading-callout">
+            <p class="reading-ref">` + reading.label + `</p>
+            <p class="reading-sub">` + info.genre + ` · Leitura ` + (reading.index + 1) + ` de ` + list.length + `</p>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="office-header">
+          <span class="office-day-tag">` + info.name + ` · ` + info.genre + `</span>
+          <h2 class="office-title">Ofício Diário Simplificado</h2>
+          <p class="office-meta">Progresso neste dia da semana: ` + doneCount + ` de ` + list.length + ` leituras concluídas</p>
+        </div>
+
+        <section class="liturgy-block">
+          <h3 class="liturgy-label">1. Salmo do Dia</h3>
+          <div class="reading-callout">
+            <p class="reading-ref">` + reading.psalm + `</p>
+          </div>
+        </section>
+
+        <section class="liturgy-block">
+          <h3 class="liturgy-label">2. Glória Patri</h3>
+          <p class="prayer-text">Glória ao Pai e ao Filho e ao Espírito Santo;<br><span class="prayer-response">como era no princípio, é agora e será sempre, por todos os séculos. Amém.</span></p>
+        </section>
+
+        <section class="liturgy-block">
+          <h3 class="liturgy-label">3. Leitura Bíblica do Dia</h3>
+          ` + readingHtml + `
+        </section>
+
+        <section class="liturgy-block">
+          <h3 class="liturgy-label">4. Momento Opcional</h3>
+          <div class="rubric-box">` + LITURGY.rubric + `</div>
+        </section>
+
+        <section class="liturgy-block">
+          <h3 class="liturgy-label">5. Oração do Pai Nosso</h3>
+          <p class="prayer-text">` + LITURGY.lordsPrayer + `</p>
+        </section>
+
+        <section class="liturgy-block">
+          <h3 class="liturgy-label">6. ` + collectTitle + `</h3>
+          <p class="prayer-text">` + collectText + `</p>
+        </section>
+
+        <div class="office-actions">
+          <div>
+            <strong>Concluiu a meditação de hoje?</strong>
+            <div class="office-meta">Ao marcar como lida, o ofício avança para a próxima leitura sequencial de ` + info.name + `.</div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="markCurrentOfficeRead()">Marcar Leitura como Lida</button>
+        </div>
+      `;
+    }
+
+    function renderPlanTab() {
+      const dayEl = document.getElementById(`plan-day-filter`);
+      const statusEl = document.getElementById(`plan-status-filter`);
+      const listEl = document.getElementById(`plan-list`);
+      const sumEl = document.getElementById(`plan-summary`);
+      if (!dayEl || !statusEl || !listEl || !sumEl) return;
+
+      const day = parseInt(dayEl.value, 10);
+      const filterStatus = statusEl.value;
+      const items = PLAN[day] || [];
+      const current = getNextReadingForDay(day);
+      const currentId = current ? current.id : null;
+
+      let readCount = 0;
+      let skippedCount = 0;
+      const rowsHtml = [];
+
+      items.forEach(function (r) {
+        const isCompleted = isReadingCompleted(r.id);
+        const isSkipped = !isCompleted && isReadingSkippedByConfig(r);
+        const isDone = isCompleted || isSkipped;
+        const isCurrent = r.id === currentId;
+
+        if (isCompleted) readCount++;
+        else if (isSkipped) skippedCount++;
+
+        if (filterStatus === `pending` && isDone) return;
+        if (filterStatus === `done` && !isDone) return;
+
+        let badgeHtml = `<span class="badge">Pendente</span>`;
+        if (isCurrent) badgeHtml = `<span class="badge badge-current">Atual</span>`;
+        else if (isCompleted) badgeHtml = `<span class="badge badge-read">Lida</span>`;
+        else if (isSkipped) badgeHtml = `<span class="badge badge-skipped">Pulada (cap. lidos)</span>`;
+
+        const rowClass = `plan-row` + (isCurrent ? ` is-current` : ``) + (isDone ? ` is-done` : ``);
+        const titleText = r.isSunday ? (r.title + ` — ` + r.at + ` · ` + r.ep + ` · ` + r.ev) : r.label;
+        const btnLabel = isCompleted ? `Desmarcar` : `Marcar lida`;
+
+        rowsHtml.push(`
+          <div class="` + rowClass + `">
+            <div class="plan-index">#` + String(r.index + 1).padStart(3, `0`) + `</div>
+            <div>
+              <div class="plan-main-ref">` + titleText + `</div>
+              <div class="plan-psalm-ref">` + r.psalm + ` ` + badgeHtml + `</div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-secondary btn-small" onclick="toggleReadingInPlan('` + r.id + `')">` + btnLabel + `</button>
+            </div>
+          </div>
+        `);
+      });
+
+      const info = DAY_INFO[day];
+      sumEl.textContent = info.name + ` (` + info.genre + `): ` + readCount + ` lidas manualmente, ` + skippedCount + ` puladas por capítulos já lidos, de ` + items.length + ` totais.`;
+
+      if (rowsHtml.length === 0) {
+        listEl.innerHTML = `<div class="empty-state"><p>Nenhuma leitura encontrada para o filtro selecionado.</p></div>`;
+      } else {
+        listEl.innerHTML = rowsHtml.join(``);
+      }
+    }
+
+    function renderConfigTab() {
+      const searchEl = document.getElementById(`config-search`);
+      const genreEl = document.getElementById(`config-genre-filter`);
+      const listEl = document.getElementById(`config-books-list`);
+      if (!searchEl || !genreEl || !listEl) return;
+
+      const query = searchEl.value.trim().toLowerCase();
+      const genreDay = genreEl.value;
+
+      const filtered = BOOKS.filter(function (b) {
+        if (genreDay !== `all` && String(b.day) !== genreDay) return false;
+        if (query && b.name.toLowerCase().indexOf(query) === -1) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty-state"><p>Nenhum livro corresponde ao filtro informado.</p></div>`;
+        return;
+      }
+
+      const html = filtered.map(function (b) {
+        const readList = appState.readChapters[b.id] || [];
+        const allRead = readList.length >= b.ch;
+        const isExpanded = !!expandedBooks[b.id];
+        const dayInfo = DAY_INFO[b.day];
+
+        let chaptersHtml = ``;
+        if (isExpanded) {
+          const btns = [];
+          for (let c = 1; c <= b.ch; c++) {
+            const active = readList.indexOf(c) !== -1;
+            btns.push(`<button type="button" class="chap-btn` + (active ? ` is-read` : ``) + `" onclick="toggleChapter('` + b.id + `', ` + c + `)" aria-pressed="` + active + `" aria-label="` + b.name + ` capítulo ` + c + `">` + c + `</button>`);
+          }
+          chaptersHtml = `<div class="chapters-grid">` + btns.join(``) + `</div>`;
+        }
+
+        return `
+          <div class="book-card">
+            <div class="book-header">
+              <div class="book-title-wrap">
+                <input type="checkbox" class="book-check" id="chk-book-` + b.id + `" ` + (allRead ? `checked` : ``) + ` onchange="toggleWholeBook('` + b.id + `', this.checked)">
+                <label class="book-name" for="chk-book-` + b.id + `">` + b.name + `</label>
+                <span class="badge">` + dayInfo.short + `</span>
+              </div>
+              <div style="display:flex; align-items:center; gap: var(--space-md);">
+                <span class="book-progress-text">` + readList.length + ` / ` + b.ch + ` cap.</span>
+                <button type="button" class="btn btn-secondary btn-small" onclick="toggleBookExpand('` + b.id + `')">` + (isExpanded ? `Ocultar capítulos` : `Capítulos`) + `</button>
+              </div>
+            </div>
+            ` + chaptersHtml + `
+          </div>
+        `;
+      }).join(``);
+
+      listEl.innerHTML = html;
+    }
+
+    // =========================================================================
+    // 7. INICIALIZACAO
+    // =========================================================================
+    async function initApp() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === `object`) {
+            if (Array.isArray(saved.completedReadings)) appState.completedReadings = saved.completedReadings;
+            if (saved.readChapters && typeof saved.readChapters === `object`) appState.readChapters = saved.readChapters;
+            if (typeof saved.selectedOfficeDay === `number`) appState.selectedOfficeDay = saved.selectedOfficeDay;
+            if (saved.selectedPeriod === `morning` || saved.selectedPeriod === `evening`) appState.selectedPeriod = saved.selectedPeriod;
+          }
+        }
+      } catch (err) {
+        console.error(`Erro ao carregar estado salvo:`, err);
+      }
+
+      // Na abertura, detecta sempre o dia da semana atual e hora atual por padrao
+      const now = new Date();
+      appState.selectedOfficeDay = now.getDay();
+      appState.selectedPeriod = now.getHours() < 12 ? `morning` : `evening`;
+
+      const planFilter = document.getElementById(`plan-day-filter`);
+      if (planFilter) planFilter.value = String(appState.selectedOfficeDay);
+
+      syncAutoCompletedBooks();
+      renderMetrics();
+      renderOfficeTab();
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
